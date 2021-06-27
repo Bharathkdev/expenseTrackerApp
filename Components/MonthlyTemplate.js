@@ -27,6 +27,7 @@ const MonthlyTemplate = (props) => {
   const dispatch = useDispatch();
   return (
     <TouchableOpacity
+      activeOpacity={0.5}
       onPress={() => {
         props.navigation.navigate('Daily');
         dispatch(

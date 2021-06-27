@@ -15,6 +15,8 @@ import {
   ActivityIndicator,
   Button,
   KeyboardAvoidingView,
+  ScrollView,
+  FlatList,
 } from 'react-native';
 import CustomButton from './CustomButton';
 import DateTimePicker from 'react-native-modal-datetime-picker';
@@ -23,6 +25,9 @@ import {useSelector, useDispatch} from 'react-redux';
 import * as AddDataActions from '../Store/Actions/AddDataAction';
 import {Dropdown} from 'react-native-material-dropdown';
 import Colors from '../Constants/Colors';
+import {ScaledSheet, moderateScale} from 'react-native-size-matters';
+import Icon from 'react-native-vector-icons/Entypo';
+import CustomModalGridView from './CustomModalGridView';
 
 const DATA_INPUT_UPDATE = 'DATA_INPUT_UPDATE';
 
@@ -73,6 +78,11 @@ const AddDataTemplate = (props) => {
   const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState();
+  const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
+  const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
+  const [onFocusAmount, setOnFocusAmount] = useState(false);
+  const [onFocusNote, setOnFocusNote] = useState(false);
+  const [onFocusDescription, setOnFocusDescription] = useState(false);
 
   const dataItems = useSelector((state) => state.data.dataItems);
   const visibilityData = useSelector((state) => state.data.visibility);
@@ -109,24 +119,49 @@ const AddDataTemplate = (props) => {
     textChangeHandler('Time', time);
   };
 
+  const displayPaymentModal = () => {
+    setIsPaymentModalVisible(true);
+  };
+
+  const hidePaymentModal = () => {
+    setIsPaymentModalVisible(false);
+  };
+
+  const displayCategoryModal = () => {
+    setIsCategoryModalVisible(true);
+  };
+
+  const hideCategoryodal = () => {
+    setIsCategoryModalVisible(false);
+  };
+
+  const showFocusAmount = () => {
+    setOnFocusAmount(true);
+  };
+
+  const hideFocusAmount = () => {
+    setOnFocusAmount(false);
+  };
+
+  const showFocusNote = () => {
+    setOnFocusNote(true);
+  };
+
+  const hideFocusNote = () => {
+    setOnFocusNote(false);
+  };
+
+  const showFocusDescription = () => {
+    setOnFocusDescription(true);
+  };
+
+  const hideFocusDescription = () => {
+    setOnFocusDescription(false);
+  };
+
   const dispatch = useDispatch();
 
   const dataID = props.dataID;
-
-  let chooseAccount = [
-    {
-      label: 'Cash',
-      value: 'Cash',
-    },
-    {
-      label: 'Accounts',
-      value: 'Accounts',
-    },
-    {
-      label: 'Card',
-      value: 'Card',
-    },
-  ];
 
   // console.log("details in Add data screen::::::", typeof props.details.date, " ", props.details.date, " ", new Date(props.details.date), " ", typeof props.date, " ", props.date, " ", new Date(props.date));
 
@@ -253,6 +288,7 @@ const AddDataTemplate = (props) => {
             addDataState.inputs.Description,
           ),
         );
+        await dispatch(AddDataActions.fetchData());
       } catch (error) {
         setError(error.message);
       }
@@ -302,6 +338,7 @@ const AddDataTemplate = (props) => {
             ),
           );
         }
+        await dispatch(AddDataActions.fetchData());
       } catch (error) {
         setError(error.message);
       }
@@ -332,12 +369,23 @@ const AddDataTemplate = (props) => {
             addDataState.inputs.Description,
           ),
         );
+        await dispatch(AddDataActions.fetchData());
       } catch (error) {
         setError(error.message);
         console.log('Im error for different dates: ', error.message);
       }
       setNav(true);
       setIsLoading(false);
+    }
+  };
+
+  const displayCategoryItems = () => {
+    if (props.title === 'Income') {
+      return props.categoryItemsIncome;
+    } else if (props.title === 'Expense') {
+      return props.categoryItemsExpense;
+    } else {
+      return props.paymentItems;
     }
   };
 
@@ -362,156 +410,284 @@ const AddDataTemplate = (props) => {
     // behavior={"padding"}
     // keyboardVerticalOffset = {40}
     // style={{flex: 1}}>
-    <>
-      <View style={styles.container}>
-        <View style={styles.leftContainer}>
-          <Text style={{paddingBottom: 40, color: 'grey'}}>Date*</Text>
-          {transfer ? (
-            <Text style={{paddingBottom: 40, color: 'grey'}}>From*</Text>
-          ) : (
-            <Text style={{paddingBottom: 40, color: 'grey'}}>Payment*</Text>
-          )}
-          {transfer ? (
-            <Text style={{paddingBottom: 35, color: 'grey'}}>To*</Text>
-          ) : (
-            <Text style={{paddingBottom: 35, color: 'grey'}}>Category*</Text>
-          )}
-          <Text style={{paddingBottom: 30, color: 'grey'}}>Amount</Text>
-          <Text style={{color: 'grey'}}>Note</Text>
-        </View>
-        <View style={styles.rightContainer}>
-          <View style={styles.dateAndTime}>
-            <TouchableOpacity onPress={showDatePicker}>
-              <Text style={{paddingRight: 20}}>
-                {addDataState.inputs.Date.toDateString()}
-              </Text>
-            </TouchableOpacity>
-            <DateTimePicker
-              date={addDataState.inputs.Date}
-              //  style={{width: 320, backgroundColor: "white"}}
-              isVisible={isDatePickerVisible}
-              mode="date"
-              onConfirm={handleDateConfirm}
-              onCancel={hideDatePicker}
-              display="default"
-              // onChange = {onChange}
-            />
-            <TouchableOpacity onPress={showTimePicker}>
-              <Text>
-                {addDataState.inputs.Time.toLocaleTimeString().substring(0, 5)}
-              </Text>
-            </TouchableOpacity>
-            <DateTimePicker
-              date={addDataState.inputs.Time}
-              isVisible={isTimePickerVisible}
-              mode="time"
-              is24Hour={true}
-              display="default"
-              onConfirm={handleTimeConfirm}
-              onCancel={hideTimePicker}
-            />
+    <View style={{flex: 1}}>
+      <ScrollView style={{flex: 1}}>
+        <View style={styles.container}>
+          <View style={styles.leftContainer}>
+            <Text style={{paddingBottom: 40, color: 'grey'}}>Date*</Text>
+            {transfer ? (
+              <Text style={{paddingBottom: 40, color: 'grey'}}>From*</Text>
+            ) : (
+              <Text style={{paddingBottom: 40, color: 'grey'}}>Payment*</Text>
+            )}
+            {transfer ? (
+              <Text style={{paddingBottom: 35, color: 'grey'}}>To*</Text>
+            ) : (
+              <Text style={{paddingBottom: 35, color: 'grey'}}>Category*</Text>
+            )}
+            <Text style={{paddingBottom: 30, color: 'grey'}}>Amount</Text>
+            <Text style={{color: 'grey'}}>Note</Text>
           </View>
-          <Dropdown
-            useNativeDriver={true}
-            containerStyle={{width: '100%'}}
-            style={{color: 'black'}}
-            data={chooseAccount}
-            value={addDataState.inputs.Payment}
-            itemColor={'skyblue'}
-            onChangeText={textChangeHandler.bind(this, 'Payment')}
-          />
-          {transfer ? (
-            <Dropdown
-              useNativeDriver={true}
-              containerStyle={{width: '100%', marginTop: -13, marginBottom: -3}}
-              style={{color: 'black'}}
-              data={chooseAccount}
-              value={addDataState.inputs.Category}
-              itemColor={'skyblue'}
-              onChangeText={textChangeHandler.bind(this, 'Category')}
-            />
-          ) : (
+          <View style={styles.rightContainer}>
+            <View style={styles.dateAndTime}>
+              <TouchableOpacity
+                onPress={() => {
+                  showDatePicker();
+                  hideCategoryodal();
+                  hidePaymentModal();
+                }}>
+                <Text style={{paddingRight: 20}}>
+                  {addDataState.inputs.Date.toDateString()}
+                </Text>
+              </TouchableOpacity>
+              <DateTimePicker
+                date={addDataState.inputs.Date}
+                //  style={{width: 320, backgroundColor: "white"}}
+                isVisible={isDatePickerVisible}
+                mode="date"
+                onConfirm={handleDateConfirm}
+                onCancel={hideDatePicker}
+                display="default"
+                // onChange = {onChange}
+              />
+              <TouchableOpacity
+                onPress={() => {
+                  showTimePicker();
+                  hideCategoryodal();
+                  hidePaymentModal();
+                }}>
+                <Text>
+                  {addDataState.inputs.Time.toLocaleTimeString().substring(
+                    0,
+                    5,
+                  )}
+                </Text>
+              </TouchableOpacity>
+              <DateTimePicker
+                date={addDataState.inputs.Time}
+                isVisible={isTimePickerVisible}
+                mode="time"
+                is24Hour={true}
+                display="default"
+                onConfirm={handleTimeConfirm}
+                onCancel={hideTimePicker}
+              />
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                displayPaymentModal();
+                hideCategoryodal();
+              }}
+              style={{
+                borderBottomWidth: 1,
+                marginTop: moderateScale(30),
+                borderColor: isPaymentModalVisible ? '#DC143C' : 'lightgrey',
+              }}>
+              <Text style={{paddingBottom: moderateScale(5)}}>
+                {addDataState.inputs.Payment}
+              </Text>
+            </TouchableOpacity>
+            {transfer ? (
+              <TouchableOpacity
+                onPress={() => {
+                  displayCategoryModal();
+                  hidePaymentModal();
+                }}
+                style={{
+                  borderBottomWidth: 1,
+                  marginTop: moderateScale(30),
+                  borderColor: isCategoryModalVisible ? '#DC143C' : 'lightgrey',
+                }}>
+                <Text style={{paddingBottom: moderateScale(5)}}>
+                  {addDataState.inputs.Category}
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                onPress={() => {
+                  displayCategoryModal();
+                  hidePaymentModal();
+                }}
+                style={{
+                  borderBottomWidth: 1,
+                  marginTop: moderateScale(30),
+                  borderColor: isCategoryModalVisible ? '#DC143C' : 'lightgrey',
+                }}>
+                <Text style={{paddingBottom: moderateScale(5)}}>
+                  {addDataState.inputs.Category}
+                </Text>
+              </TouchableOpacity>
+            )}
             <TextInput
               {...props}
-              style={styles.textInput}
-              value={addDataState.inputs.Category}
-              onChangeText={textChangeHandler.bind(this, 'Category')}
+              onFocus={() => {
+                showFocusAmount();
+                hideCategoryodal();
+                hidePaymentModal();
+              }}
+              onBlur={hideFocusAmount}
+              // onTouchStart={() => {
+              //   hideCategoryodal();
+              //   hidePaymentModal();
+              // }}
+              keyboardType="decimal-pad"
+              style={{
+                ...styles.textInput,
+                borderBottomColor: onFocusAmount ? '#DC143C' : 'lightgrey',
+                marginTop: moderateScale(13),
+                paddingBottom: moderateScale(0),
+              }}
+              value={addDataState.inputs.Amount}
+              onChangeText={textChangeHandler.bind(this, 'Amount')}
             />
-          )}
-          <TextInput
-            {...props}
-            keyboardType="decimal-pad"
-            style={styles.textInput}
-            value={addDataState.inputs.Amount}
-            onChangeText={textChangeHandler.bind(this, 'Amount')}
-          />
-          <TextInput
-            {...props}
-            multiline={true}
-            style={styles.textInput}
-            value={addDataState.inputs.Note}
-            onChangeText={textChangeHandler.bind(this, 'Note')}
-          />
+            <TextInput
+              {...props}
+              onFocus={() => {
+                hideCategoryodal();
+                hidePaymentModal();
+                showFocusNote();
+              }}
+              onBlur={hideFocusNote}
+              multiline={true}
+              style={{
+                ...styles.textInput,
+                borderBottomColor: onFocusNote ? '#DC143C' : 'lightgrey',
+                marginTop: moderateScale(10),
+                paddingBottom: moderateScale(0),
+              }}
+              value={addDataState.inputs.Note}
+              onChangeText={textChangeHandler.bind(this, 'Note')}
+            />
+          </View>
         </View>
-      </View>
-      <View
-        style={{
-          paddingTop: 25,
-          borderBottomColor: '#ECECEC',
-          borderBottomWidth: 10,
-        }}
-      />
-      <View style={{paddingHorizontal: 15, paddingTop: 10}}>
+        <View
+          style={{
+            paddingTop: 25,
+            borderBottomColor: '#ECECEC',
+            borderBottomWidth: 10,
+          }}
+        />
         <TextInput
           {...props}
+          onFocus={() => {
+            hideCategoryodal();
+            hidePaymentModal();
+            showFocusDescription();
+          }}
+          onBlur={hideFocusDescription}
           multiline={true}
           placeholder="Description"
-          style={styles.textInput}
+          style={{
+            ...styles.textInput,
+            borderBottomColor: onFocusDescription ? '#DC143C' : 'lightgrey',
+            marginHorizontal: moderateScale(10),
+            marginTop: moderateScale(5),
+            paddingBottom: moderateScale(2),
+          }}
           value={addDataState.inputs.Description}
           onChangeText={textChangeHandler.bind(this, 'Description')}
         />
-      </View>
+        {isLoading ? (
+          <View style={styles.loadingIndicatorStyle}>
+            <ActivityIndicator size="small" color="white" />
+          </View>
+        ) : (
+          <View style={styles.customButton}>
+            <CustomButton onSave={saveHandler}>Save</CustomButton>
+          </View>
+        )}
+        <View style={{height: 60}} />
+      </ScrollView>
+      {isPaymentModalVisible ? (
+        <View style={styles.modalViewContainer}>
+          <View style={styles.innerModalView}>
+            <Text style={styles.modalText}>Payment</Text>
+            <Icon
+              name="cross"
+              size={20}
+              color="white"
+              onPress={hidePaymentModal}
+            />
+          </View>
+          <View>
+            <FlatList
+              keyExtractor={(item, index) => index}
+              data={props.paymentItems}
+              numColumns={3}
+              renderItem={(itemData) => {
+                return (
+                  <CustomModalGridView
+                    key={new Date().getTime()}
+                    item={itemData.item}
+                    selectedItem={textChangeHandler.bind(this, 'Payment')}
+                  />
+                );
+              }}
+            />
+          </View>
+        </View>
+      ) : null}
 
-      {isLoading ? (
-        <View style={styles.loadingIndicatorStyle}>
-          <ActivityIndicator size="small" color="white" />
+      {isCategoryModalVisible ? (
+        <View style={styles.modalViewContainer}>
+          <View style={styles.innerModalView}>
+            <Text style={styles.modalText}>Category</Text>
+            <Icon
+              name="cross"
+              size={20}
+              color="white"
+              onPress={hideCategoryodal}
+            />
+          </View>
+          <View style={{marginBottom: 50}}>
+            <FlatList
+              keyExtractor={(item, index) => index}
+              data={displayCategoryItems()}
+              numColumns={3}
+              renderItem={(itemData) => {
+                return (
+                  <CustomModalGridView
+                    key={new Date().getTime()}
+                    item={itemData.item}
+                    navigation={props.navigation}
+                    selectedItem={textChangeHandler.bind(this, 'Category')}
+                  />
+                );
+              }}
+            />
+          </View>
         </View>
-      ) : (
-        <View style={styles.customButton}>
-          <CustomButton onSave={saveHandler}>Save</CustomButton>
-        </View>
-      )}
-      <View style={{height: 60}} />
-    </>
+      ) : null}
+    </View>
   );
 };
 
-const styles = StyleSheet.create({
+const styles = ScaledSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
 
   leftContainer: {
-    marginLeft: 15,
-    marginTop: 35,
+    marginLeft: '15@ms',
+    marginTop: '35@ms',
   },
 
   rightContainer: {
-    marginTop: 35,
-    marginRight: 15,
+    marginTop: '35@ms',
+    marginRight: '15@ms',
     width: '70%',
   },
 
   textInput: {
-    borderBottomColor: '#ECECEC',
-    borderBottomWidth: 1,
+    borderBottomColor: 'lightgrey',
+    borderBottomWidth: '1@ms',
   },
 
   customButton: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: 40,
+    paddingTop: '40@ms',
   },
 
   dateAndTime: {
@@ -519,11 +695,29 @@ const styles = StyleSheet.create({
   },
 
   loadingIndicatorStyle: {
-    borderRadius: 20,
+    borderRadius: '20@ms',
     backgroundColor: '#DC143C',
-    marginTop: 40,
-    margin: 110,
-    padding: 13,
+    marginTop: '40@ms',
+    margin: '110@ms',
+    padding: '13@ms',
+  },
+
+  modalViewContainer: {
+    flex: 1,
+    backgroundColor: '#F5F5F5',
+  },
+
+  modalText: {
+    color: 'white',
+  },
+
+  innerModalView: {
+    flexDirection: 'row',
+    paddingVertical: '12@ms',
+    paddingHorizontal: '10@ms',
+    backgroundColor: 'black',
+    width: '100%',
+    justifyContent: 'space-between',
   },
 });
 

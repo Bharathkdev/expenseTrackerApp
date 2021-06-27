@@ -57,39 +57,24 @@ const CalendarScreen = (props) => {
     return calendar;
   };
 
+  const dataFromRedux = useSelector((state) => state.data.dataItems);
+
   const loadCalendarData = useCallback(async () => {
-    setError(null);
-    setIsLoading(true);
-    try {
-      await dispatch(AddDataActions.fetchData());
-      dispatch(
-        AddDataActions.loadTransactionsCalendar(
-          getDaysInAMonth(monthYearFilterData.year, monthYearFilterData.month),
-          monthYearFilterData.year,
-          monthYearFilterData.month,
-        ),
-      );
-    } catch (error) {
-      setError(error.message);
-      console.log('Error in calendar screen: ', error);
-    }
-    setIsLoading(false);
+    dispatch(
+      AddDataActions.loadTransactionsCalendar(
+        getDaysInAMonth(monthYearFilterData.year, monthYearFilterData.month),
+        monthYearFilterData.year,
+        monthYearFilterData.month,
+      ),
+    );
   }, [dispatch, monthYearFilterData]);
 
   useEffect(() => {
-    const willFocusSubscription = props.navigation.addListener(
-      'didFocus',
-      loadCalendarData,
-    );
-
-    return () => {
-      willFocusSubscription.remove();
-    };
-  }, []);
-
-  useEffect(() => {
-    loadCalendarData();
-  }, [monthYearFilterData]);
+    if (props.isFocused) {
+      console.log('Calendar focused ');
+      loadCalendarData();
+    }
+  }, [dataFromRedux, monthYearFilterData, props.isFocused]);
 
   const dataItems = useSelector((state) => {
     const transformedDataItems = [];
@@ -201,4 +186,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withNavigation(CalendarScreen);
+export default withNavigationFocus(CalendarScreen);

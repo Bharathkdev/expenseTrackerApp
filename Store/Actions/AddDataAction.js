@@ -118,7 +118,7 @@ export const addData = (
 
     balanceAmountAllDate = totalIncomeAllDate - totalExpenseAllDate;
 
-    const addDataResponse = await fetch(
+    await fetch(
       `https://money-manager-252627-default-rtdb.firebaseio.com/dataItems/${date
         .getFullYear()
         .toString()}/${date.getMonth().toString()}/${date.toDateString()}.json`,
@@ -135,11 +135,7 @@ export const addData = (
       },
     );
 
-    const updateAllAmount = updateAmount(
-      totalIncomeAllDate,
-      totalExpenseAllDate,
-      balanceAmountAllDate,
-    );
+    updateAmount(totalIncomeAllDate, totalExpenseAllDate, balanceAmountAllDate);
   };
 };
 
@@ -218,7 +214,7 @@ export const addDataInExistingDate = (
 
     console.log('Am I gettin called: ', index);
 
-    const addDataInExistingDateResponse = await fetch(
+    await fetch(
       `https://money-manager-252627-default-rtdb.firebaseio.com/dataItems/${year}/${month}/${dateInString}/${index}.json`,
       {
         method: 'PATCH',
@@ -233,22 +229,23 @@ export const addDataInExistingDate = (
       },
     );
 
-    const updateAllAmount = updateAmount(
-      totalIncomeAllDate,
-      totalExpenseAllDate,
-      balanceAmountAllDate,
-    );
+    updateAmount(totalIncomeAllDate, totalExpenseAllDate, balanceAmountAllDate);
   };
 };
 
-const updateAmount = (
+const updateAmount = async (
   totalIncomeAllDate,
   totalExpenseAllDate,
   balanceAmountAllDate,
 ) => {
-  console.log('Im update amount method outer');
+  console.log(
+    'Im update amount method outer',
+    totalIncomeAllDate,
+    totalExpenseAllDate,
+    balanceAmountAllDate,
+  );
 
-  const updateTotalIncomeResponse = fetch(
+  await fetch(
     `https://money-manager-252627-default-rtdb.firebaseio.com/totalIncome.json`,
     {
       method: 'PATCH',
@@ -261,7 +258,7 @@ const updateAmount = (
     },
   );
 
-  const updateTotalExpenseResponse = fetch(
+  await fetch(
     `https://money-manager-252627-default-rtdb.firebaseio.com/totalExpense.json`,
     {
       method: 'PATCH',
@@ -274,7 +271,7 @@ const updateAmount = (
     },
   );
 
-  const updateBalanceResponse = fetch(
+  await fetch(
     `https://money-manager-252627-default-rtdb.firebaseio.com/totalBalance.json`,
     {
       method: 'PATCH',
@@ -287,20 +284,20 @@ const updateAmount = (
     },
   );
 
-  const promise = Promise.all([
-    updateTotalIncomeResponse,
-    updateTotalExpenseResponse,
-    updateBalanceResponse,
-  ]);
+  // const promise = Promise.all([
+  //   updateTotalIncomeResponse,
+  //   updateTotalExpenseResponse,
+  //   updateBalanceResponse,
+  // ]);
 
-  promise
-    .then((values) => {
-      const value = values[0].json;
-      console.log('Successfully updated amounts', value);
-    })
-    .catch((err) => {
-      throw new Error('Amount Updation failed: ', err);
-    });
+  // promise
+  //   .then((values) => {
+  //     const value = values[0].json;
+  //     console.log('Successfully updated amounts', value);
+  //   })
+  //   .catch((err) => {
+  //     throw new Error('Amount Updation failed: ', err);
+  //   });
 };
 
 export const updateData = (
@@ -469,7 +466,7 @@ export const updateData = (
       balanceAmountAllDateUpdate =
         totalIncomeAllDateUpdate - totalExpenseAllDateUpdate;
 
-      const updateToDateResponse = await fetch(
+      await fetch(
         `https://money-manager-252627-default-rtdb.firebaseio.com/dataItems/${yearToUpdate}/${monthToUpdate}/${dateToUpdate}.json`,
         {
           method: 'POST',
@@ -495,7 +492,7 @@ export const updateData = (
 
         innerDataUpdateFromDate = fromDateDataFromRedux.details;
 
-        const updateFromDateResponse = await fetch(
+        await fetch(
           `https://money-manager-252627-default-rtdb.firebaseio.com/dataItems/${dataComingFromYear}/${dataComingFromMonth}/${dataComingFromDate}/${fromDateIndex}.json`,
           {
             method: 'PATCH',
@@ -511,7 +508,7 @@ export const updateData = (
         );
       }
 
-      const updateAllAmount = updateAmount(
+      updateAmount(
         totalIncomeAllDateUpdate,
         totalExpenseAllDateUpdate,
         balanceAmountAllDateUpdate,
@@ -638,7 +635,7 @@ export const updateData = (
       balanceAmountAllDateUpdate =
         totalIncomeAllDateUpdate - totalExpenseAllDateUpdate;
 
-      const updateToDateResponse = await fetch(
+      await fetch(
         `https://money-manager-252627-default-rtdb.firebaseio.com/dataItems/${yearToUpdate}/${monthToUpdate}/${dateToUpdate}/${toDateIndex}.json`,
         {
           method: 'PATCH',
@@ -664,7 +661,7 @@ export const updateData = (
 
         innerDataUpdateFromDate = fromDateDataFromRedux.details;
 
-        const updateFromDateResponse = await fetch(
+        await fetch(
           `https://money-manager-252627-default-rtdb.firebaseio.com/dataItems/${dataComingFromYear}/${dataComingFromMonth}/${dataComingFromDate}/${fromDateIndex}.json`,
           {
             method: 'PATCH',
@@ -680,7 +677,7 @@ export const updateData = (
         );
       }
 
-      const updateAllAmount = updateAmount(
+      updateAmount(
         totalIncomeAllDateUpdate,
         totalExpenseAllDateUpdate,
         balanceAmountAllDateUpdate,
@@ -788,7 +785,7 @@ export const updateData = (
       balanceAmountAllDateUpdate =
         totalIncomeAllDateUpdate - totalExpenseAllDateUpdate;
 
-      const updateToDateResponse = await fetch(
+      await fetch(
         `https://money-manager-252627-default-rtdb.firebaseio.com/dataItems/${yearToUpdate}/${monthToUpdate}/${dateToUpdate}/${toDateIndex}.json`,
         {
           method: 'PATCH',
@@ -803,7 +800,7 @@ export const updateData = (
         },
       );
 
-      const updateAllAmount = updateAmount(
+      updateAmount(
         totalIncomeAllDateUpdate,
         totalExpenseAllDateUpdate,
         balanceAmountAllDateUpdate,
@@ -832,11 +829,18 @@ export const deleteMultipleData = (deleteItems, year, month) => {
     let deleteTotalIncomeAllDateUpdate = getState().data.totalIncome,
       deleteTotalExpenseAllDateUpdate = getState().data.totalExpense;
 
-    await getState().data.selectedDataItems.forEach(async (arr) => {
+    console.log(
+      'Update delete data selected items: ',
+      getState().data.selectedDataItems,
+      deleteItems,
+    );
+    for await (const arr of deleteItems) {
+      // }
+      //await deleteItems.map(async (arr, pos) => {
       const index = arr.index;
       const date = arr.date;
 
-      console.log('Im Delete multiple data action');
+      //  console.log('Im Delete multiple data action called: ', pos);
 
       await dispatch(fetchData());
 
@@ -849,6 +853,16 @@ export const deleteMultipleData = (deleteItems, year, month) => {
       );
 
       const dataFromRedux = getState().data.dataItems[year][month];
+
+      console.log(
+        'update delete data details: ',
+        dataFromRedux[date][index].details,
+      );
+
+      console.log(
+        'update delete data details length now: ',
+        dataFromRedux[date][index].details.length,
+      );
 
       if (dataFromRedux[date][index].details.length == 1) {
         if (arr.type === 'Income') {
@@ -887,10 +901,10 @@ export const deleteMultipleData = (deleteItems, year, month) => {
           deleteTotalExpenseUpdate,
         );
 
-        const updateData = await fetch(
+        const updateDeleteData = await fetch(
           `https://money-manager-252627-default-rtdb.firebaseio.com/dataItems/${year}/${month}/${date}/${index}.json`,
           {
-            method: 'PATCH',
+            method: 'PUT',
             headers: {
               'Content-type': 'application/json',
             },
@@ -901,9 +915,12 @@ export const deleteMultipleData = (deleteItems, year, month) => {
             }),
           },
         );
-      }
-    });
 
+        const updateDeleteDataResponse = await updateDeleteData.json();
+        console.log('Update delete data response: ', updateDeleteDataResponse);
+      }
+      //});
+    }
     console.log(
       'Updated delete amounts: ',
       deleteTotalIncomeAllDateUpdate,
@@ -913,7 +930,7 @@ export const deleteMultipleData = (deleteItems, year, month) => {
       getState().data.balanceAmount,
     );
 
-    updateAmount(
+    await updateAmount(
       deleteTotalIncomeAllDateUpdate,
       deleteTotalExpenseAllDateUpdate,
       deleteTotalIncomeAllDateUpdate - deleteTotalExpenseAllDateUpdate,

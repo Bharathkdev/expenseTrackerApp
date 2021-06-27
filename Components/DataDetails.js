@@ -141,8 +141,9 @@ const DataDetails = (props) => {
 
   return (
     <TouchableOpacity
-      onLongPress={props.isCalendarView ? null : longPressHandler}
       onPress={onPressHandler}
+      onLongPress={props.isCalendarView ? null : longPressHandler}
+      delayLongPress={500}
       style={{
         ...styles.detailsView,
         backgroundColor: selectedDataItemsHandler(props.dataDetails.id)

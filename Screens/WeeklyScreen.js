@@ -21,6 +21,8 @@ const WeeklyScreen = (props) => {
     (state) => state.data.MonthYearFilter,
   );
 
+  const dataFromRedux = useSelector((state) => state.data.dataItems);
+
   const dispatch = useDispatch();
 
   const getDaysInAMonth = (
@@ -58,37 +60,20 @@ const WeeklyScreen = (props) => {
   };
 
   const loadWeeklyData = useCallback(async () => {
-    setError(null);
-    setIsLoading(true);
-    try {
-      await dispatch(AddDataActions.fetchData());
-      dispatch(
-        AddDataActions.loadTransactionsWeekly(
-          getDaysInAMonth(monthYearFilterData.year, monthYearFilterData.month),
-          monthYearFilterData.year,
-        ),
-      );
-    } catch (error) {
-      setError(error.message);
-      console.log('Error in weekly screen: ', error);
-    }
-    setIsLoading(false);
+    dispatch(
+      AddDataActions.loadTransactionsWeekly(
+        getDaysInAMonth(monthYearFilterData.year, monthYearFilterData.month),
+        monthYearFilterData.year,
+      ),
+    );
   }, [dispatch, monthYearFilterData]);
 
   useEffect(() => {
-    const willFocusSubscription = props.navigation.addListener(
-      'didFocus',
-      loadWeeklyData,
-    );
-
-    return () => {
-      willFocusSubscription.remove();
-    };
-  }, [props.navigation]);
-
-  useEffect(() => {
-    loadWeeklyData();
-  }, [monthYearFilterData]);
+    if (props.isFocused) {
+      console.log('Weekly focused ');
+      loadWeeklyData();
+    }
+  }, [monthYearFilterData, dataFromRedux, props.isFocused]);
 
   const dataItems = useSelector((state) => {
     const transformedDataItems = [];
@@ -174,4 +159,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withNavigation(WeeklyScreen);
+export default withNavigationFocus(WeeklyScreen);
