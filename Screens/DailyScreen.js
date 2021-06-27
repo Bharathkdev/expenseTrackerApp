@@ -80,6 +80,10 @@ const DailyScreen = (props) => {
     };
   });
 
+  useEffect(() => {
+    loadData();
+  }, [monthYearFilterData]);
+
   // useEffect(() => {
   //   if (!mounted.current) {
   //     mounted.current = true; //ComponentDidMount
