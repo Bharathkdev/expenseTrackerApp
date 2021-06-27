@@ -1,6 +1,13 @@
 import React, {useState, useCallback, useEffect} from 'react';
-import {Text, View, StyleSheet, ScrollView} from 'react-native';
+import {
+  Text,
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import {Dropdown} from 'react-native-material-dropdown';
+import {ScaledSheet, moderateScale} from 'react-native-size-matters';
 
 import {useSelector, useDispatch} from 'react-redux';
 import AddDataComponent from '../Components/AddDataTemplate';
@@ -58,19 +65,29 @@ const AddDataScreen = (props) => {
 
   console.log('Details already available in add data screen: ', details);
 
-  let chooseType = [
-    {
-      label: 'Income',
-      value: 'Income',
-    },
-    {
-      label: 'Expense',
-      value: 'Expense',
-    },
-    {
-      label: 'Transfer',
-      value: 'Transfer',
-    },
+  const paymentItems = ['Cash', 'Account', 'Card'];
+
+  const categoryItemsIncome = [
+    'Allowance',
+    'Salary',
+    'Petty cash',
+    'Bonus',
+    'Other',
+  ];
+
+  const categoryItemsExpense = [
+    'Social Life',
+    'Self-Development',
+    'Food',
+    'Transportation',
+    'Culture',
+    'Household',
+    'Apparel',
+    'Beauty',
+    'Health',
+    'Education',
+    'Gift',
+    'Other',
   ];
 
   useEffect(() => {
@@ -86,35 +103,72 @@ const AddDataScreen = (props) => {
   console.log('Type of data stored in add data screen: ', type);
 
   return (
-    <ScrollView style={{backgroundColor: 'white', flex: 1}}>
-      <View style={styles.typeView}>
-        <Text
+    <View style={{flex: 1, backgroundColor: 'white'}}>
+      <View style={styles.typeViewStyle}>
+        <TouchableOpacity
+          activeOpacity={0.5}
           style={{
-            paddingTop: 20,
-            fontFamily: 'OpenSans-Bold',
-            fontSize: 17,
-            color: 'black',
+            ...styles.typeStyle,
+            borderColor: type === 'Income' ? '#1E90FF' : 'grey',
+          }}
+          onPress={() => {
+            setType('Income');
           }}>
-          Type:
-        </Text>
-        <Dropdown
-          useNativeDriver={true}
-          containerStyle={{width: '50%', paddingLeft: 20}}
-          style={{color: 'black'}}
-          data={chooseType}
-          value={type}
-          itemColor={'skyblue'}
-          onChangeText={(value) => setType(value)}
-        />
+          <Text
+            style={{
+              color: type === 'Income' ? '#1E90FF' : 'grey',
+              fontFamily: 'OpenSans-Bold',
+            }}>
+            Income
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          activeOpacity={0.5}
+          style={{
+            ...styles.typeStyle,
+            borderColor: type === 'Expense' ? '#DC143C' : 'grey',
+          }}
+          onPress={() => {
+            setType('Expense');
+          }}>
+          <Text
+            style={{
+              color: type === 'Expense' ? '#DC143C' : 'grey',
+              fontFamily: 'OpenSans-Bold',
+            }}>
+            Expense
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          activeOpacity={0.5}
+          style={{
+            ...styles.typeStyle,
+            borderColor: type === 'Transfer' ? 'black' : 'grey',
+          }}
+          onPress={() => {
+            setType('Transfer');
+          }}>
+          <Text
+            style={{
+              color: type === 'Transfer' ? 'black' : 'grey',
+              fontFamily: 'OpenSans-Bold',
+            }}>
+            Transfer
+          </Text>
+        </TouchableOpacity>
       </View>
       <AddDataComponent
         title={type}
         date={date}
         details={details}
         dataID={details ? dataID : null}
+        paymentItems={paymentItems}
+        categoryItemsIncome={categoryItemsIncome}
+        categoryItemsExpense={categoryItemsExpense}
         navigation={props.navigation}
       />
-    </ScrollView>
+    </View>
+    //</ScrollView>
   );
 };
 
@@ -151,7 +205,7 @@ AddDataScreen.navigationOptions = (navData) => {
   };
 };
 
-const styles = StyleSheet.create({
+const styles = ScaledSheet.create({
   typeView: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -160,6 +214,23 @@ const styles = StyleSheet.create({
 
   leftIcon: {
     marginLeft: 20,
+  },
+
+  typeViewStyle: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    marginTop: 15,
+    marginHorizontal: 10,
+    // backgroundColor: 'white',
+  },
+
+  typeStyle: {
+    borderWidth: '1@ms',
+    borderRadius: '7@ms',
+    borderColor: 'grey',
+    paddingVertical: '5@ms',
+    paddingHorizontal: '30@ms',
   },
 });
 

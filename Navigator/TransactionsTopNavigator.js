@@ -36,7 +36,7 @@ const WeeklyNavigator = createStackNavigator({
 });
 
 const MonthlyNavigator = createStackNavigator({
-  Weekly: {
+  Monthly: {
     screen: MonthlyScreen,
     navigationOptions: {
       headerShown: false,
@@ -45,7 +45,7 @@ const MonthlyNavigator = createStackNavigator({
 });
 
 const CalendarNavigator = createStackNavigator({
-  Weekly: {
+  Calendar: {
     screen: CalendarScreen,
     navigationOptions: {
       headerShown: false,
@@ -54,7 +54,7 @@ const CalendarNavigator = createStackNavigator({
 });
 
 const TotalNavigator = createStackNavigator({
-  Weekly: {
+  Total: {
     screen: TotalScreen,
     navigationOptions: {
       headerShown: false,
@@ -89,7 +89,8 @@ const TransactionsTopBar = createMaterialTopTabNavigator(
       },
     },
     lazy: true,
-    //optimizationsEnabled: true,
+    optimizationsEnabled: true,
+    // removeClippedSubviews: true,
   },
 );
 

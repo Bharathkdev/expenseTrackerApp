@@ -20,6 +20,7 @@
     "react-dynamic-font": "^2.0.1",
     "react-native": "^0.63.4",
     "react-native-bouncing-preloaders": "^1.0.0",
+    "react-native-chart-kit": "^6.11.0",
     "react-native-gesture-handler": "^1.10.0",
     "react-native-material-dropdown": "^0.11.1",
     "react-native-modal": "^12.0.2",

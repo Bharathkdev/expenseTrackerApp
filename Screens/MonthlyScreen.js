@@ -26,37 +26,20 @@ const MonthlyScreen = (props) => {
     (state) => state.data.MonthYearFilter,
   );
 
+  const dataFromRedux = useSelector((state) => state.data.dataItems);
+
   const dispatch = useDispatch();
 
   const loadYearlyData = useCallback(async () => {
-    setError(null);
-    setIsLoading(true);
-    try {
-      await dispatch(AddDataActions.fetchData());
-      dispatch(
-        AddDataActions.loadTransactionsPerYear(monthYearFilterData.year),
-      );
-    } catch (error) {
-      setError(error.message);
-      console.log('Error in monthly screen: ', error);
-    }
-    setIsLoading(false);
+    dispatch(AddDataActions.loadTransactionsPerYear(monthYearFilterData.year));
   }, [dispatch, monthYearFilterData]);
 
   useEffect(() => {
-    const willFocusSubscription = props.navigation.addListener(
-      'didFocus',
-      loadYearlyData,
-    );
-
-    return () => {
-      willFocusSubscription.remove();
-    };
-  }, []);
-
-  useEffect(() => {
-    loadYearlyData();
-  }, [monthYearFilterData]);
+    if (props.isFocused) {
+      console.log('Monthly focused ');
+      loadYearlyData();
+    }
+  }, [monthYearFilterData, dataFromRedux, props.isFocused]);
 
   const dataItems = useSelector((state) => {
     const transformedDataItems = [];
@@ -173,4 +156,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withNavigation(MonthlyScreen);
+export default withNavigationFocus(MonthlyScreen);

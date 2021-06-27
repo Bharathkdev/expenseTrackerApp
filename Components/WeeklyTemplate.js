@@ -4,6 +4,7 @@ import {View, StyleSheet, Text, TouchableOpacity} from 'react-native';
 const WeeklyTemplate = (props) => {
   return (
     <TouchableOpacity
+      activeOpacity={1}
       onPress={() => {
         props.navigation.navigate('Daily');
       }}>

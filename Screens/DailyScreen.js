@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useRef, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -25,14 +25,15 @@ const DailyScreen = (props) => {
 
   console.log('I am Screen Daily');
 
+  const dataFromRedux = useSelector((state) => state.data.dataItems);
+
   const dispatch = useDispatch();
 
   const monthYearFilterData = useSelector(
     (state) => state.data.MonthYearFilter,
   );
-  const visibilityData = useSelector((state) => state.data.visibility);
 
-  const dataFromRedux = useSelector((state) => state.data.dataItems);
+  const visibilityData = useSelector((state) => state.data.visibility);
 
   console.log('Coming from add data screen ', monthYearFilterData);
 
@@ -55,20 +56,44 @@ const DailyScreen = (props) => {
     setIsLoading(false);
   }, [monthYearFilterData]);
 
+  const loadDataUpdate = useCallback(() => {
+    dispatch(
+      AddDataActions.loadTransactionsPerMonth(
+        monthYearFilterData.month,
+        monthYearFilterData.year,
+      ),
+    );
+  }, [monthYearFilterData]);
+
+  const mounted = useRef();
+
+  console.log('UseRef daily: ', mounted.current);
+
   useEffect(() => {
-    const willFocusSubscription = props.navigation.addListener(
+    const didFocusSubscription = props.navigation.addListener(
       'didFocus',
       loadData,
     );
 
     return () => {
-      willFocusSubscription.remove();
+      didFocusSubscription.remove();
     };
-  }, []);
+  });
 
   useEffect(() => {
     loadData();
   }, [monthYearFilterData]);
+
+  // useEffect(() => {
+  //   if (!mounted.current) {
+  //     mounted.current = true; //ComponentDidMount
+  //     loadData();
+  //   } else {
+  //     // if (props.isFocused) {
+  //     loadDataUpdate(); //ComponentDidUpdate
+  //     // }
+  //   }
+  // }, [monthYearFilterData, dataFromRedux, props.isFocused]);
 
   const dataItems = useSelector((state) => {
     const transformedDataItems = [];
@@ -223,4 +248,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withNavigation(DailyScreen);
+export default withNavigationFocus(DailyScreen);
