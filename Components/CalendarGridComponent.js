@@ -25,12 +25,6 @@ const CalendarGridComponent = (props) => {
 
   const dispatch = useDispatch();
 
-  console.log(
-    'Is modal visible: ',
-    props.dataDetails,
-    typeof props.dataDetails.details,
-  );
-
   return (
     <>
       <TouchableOpacity
@@ -62,20 +56,100 @@ const CalendarGridComponent = (props) => {
             props.date.getDate()
           )}
         </Text>
-        {props.dataDetails.income != 0 && props.dataDetails.expense === 0 ? (
-          <View style={{flex: 1, justifyContent: 'flex-end', paddingLeft: 5}}>
+        {props.dataDetails.details &&
+        props.dataDetails.details.some((data) => data.type === 'Income') &&
+        !props.dataDetails.details.some((data) => data.type === 'Expense') &&
+        !props.dataDetails.details.some((data) => data.type === 'Transfer') ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'flex-end',
+              paddingLeft: moderateScale(5),
+            }}>
             <Text style={{...styles.innerType, color: 'green'}}>Income</Text>
           </View>
         ) : null}
-        {props.dataDetails.expense != 0 && props.dataDetails.income === 0 ? (
-          <View style={{flex: 1, justifyContent: 'flex-end', paddingLeft: 5}}>
+        {props.dataDetails.details &&
+        !props.dataDetails.details.some((data) => data.type === 'Income') &&
+        props.dataDetails.details.some((data) => data.type === 'Expense') &&
+        !props.dataDetails.details.some((data) => data.type === 'Transfer') ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'flex-end',
+              paddingLeft: moderateScale(5),
+            }}>
             <Text style={{...styles.innerType, color: 'red'}}>Expense</Text>
           </View>
         ) : null}
-        {props.dataDetails.expense != 0 && props.dataDetails.income != 0 ? (
-          <View style={{flex: 1, justifyContent: 'flex-end', paddingLeft: 5}}>
+        {props.dataDetails.details &&
+        props.dataDetails.details.some((data) => data.type === 'Transfer') &&
+        !props.dataDetails.details.some((data) => data.type === 'Income') &&
+        !props.dataDetails.details.some((data) => data.type === 'Expense') ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'flex-end',
+              paddingLeft: moderateScale(5),
+            }}>
+            <Text style={{...styles.innerType, color: 'black'}}>Transfer</Text>
+          </View>
+        ) : null}
+        {props.dataDetails.details &&
+        props.dataDetails.details.some((data) => data.type === 'Income') &&
+        props.dataDetails.details.some((data) => data.type === 'Expense') &&
+        props.dataDetails.details.some((data) => data.type === 'Transfer') ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'flex-end',
+              paddingLeft: moderateScale(5),
+            }}>
             <Text style={{...styles.innerType, color: 'green'}}>Income</Text>
             <Text style={{...styles.innerType, color: 'red'}}>Expense</Text>
+            <Text style={{...styles.innerType, color: 'black'}}>Transfer</Text>
+          </View>
+        ) : null}
+        {props.dataDetails.details &&
+        props.dataDetails.details.some((data) => data.type === 'Income') &&
+        props.dataDetails.details.some((data) => data.type === 'Expense') &&
+        !props.dataDetails.details.some((data) => data.type === 'Transfer') ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'flex-end',
+              paddingLeft: moderateScale(5),
+            }}>
+            <Text style={{...styles.innerType, color: 'green'}}>Income</Text>
+            <Text style={{...styles.innerType, color: 'red'}}>Expense</Text>
+          </View>
+        ) : null}
+        {props.dataDetails.details &&
+        props.dataDetails.details.some((data) => data.type === 'Income') &&
+        !props.dataDetails.details.some((data) => data.type === 'Expense') &&
+        props.dataDetails.details.some((data) => data.type === 'Transfer') ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'flex-end',
+              paddingLeft: moderateScale(5),
+            }}>
+            <Text style={{...styles.innerType, color: 'green'}}>Income</Text>
+            <Text style={{...styles.innerType, color: 'black'}}>Transfer</Text>
+          </View>
+        ) : null}
+        {props.dataDetails.details &&
+        !props.dataDetails.details.some((data) => data.type === 'Income') &&
+        props.dataDetails.details.some((data) => data.type === 'Expense') &&
+        props.dataDetails.details.some((data) => data.type === 'Transfer') ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'flex-end',
+              paddingLeft: moderateScale(5),
+            }}>
+            <Text style={{...styles.innerType, color: 'red'}}>Expense</Text>
+            <Text style={{...styles.innerType, color: 'black'}}>Transfer</Text>
           </View>
         ) : null}
       </TouchableOpacity>
@@ -89,7 +163,12 @@ const CalendarGridComponent = (props) => {
         isVisible={isModalVisible}>
         <View style={styles.modalContainer}>
           <View style={styles.crossIcon}>
-            <Icon name="cancel" size={40} color="white" onPress={hideModal} />
+            <Icon
+              name="cancel"
+              size={moderateScale(40)}
+              color="white"
+              onPress={hideModal}
+            />
           </View>
           <View style={styles.modalInnerContainer}>
             <DailyTemplate
@@ -104,9 +183,10 @@ const CalendarGridComponent = (props) => {
             <View style={styles.addIcon}>
               <Icon
                 name="add-circle"
-                size={40}
+                size={moderateScale(40)}
                 color="#DC143C"
                 onPress={() => {
+                  hideModal();
                   dispatch(
                     AddDataActions.updateVisibility(
                       false,
@@ -121,7 +201,6 @@ const CalendarGridComponent = (props) => {
                       date: props.date.toDateString(),
                     },
                   });
-                  hideModal();
                 }}
               />
             </View>
@@ -137,20 +216,20 @@ const styles = ScaledSheet.create({
     flex: 1,
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
-    height: 90,
+    height: '90@ms',
     borderWidth: 0.2,
     borderColor: 'lightgrey',
     borderStyle: 'solid',
   },
 
   innerType: {
-    fontSize: 10,
+    fontSize: '10@ms',
     fontFamily: 'OpenSans-Regular',
   },
 
   dateText: {
-    fontSize: 10,
-    paddingLeft: 5,
+    fontSize: '10@ms',
+    paddingLeft: '5@ms',
     fontFamily: 'OpenSans-Bold',
   },
 

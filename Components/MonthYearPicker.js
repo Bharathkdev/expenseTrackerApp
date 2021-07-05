@@ -1,14 +1,27 @@
 import React, {useState, useCallback} from 'react';
-import {StyleSheet, View, Text, TouchableOpacity, Alert} from 'react-native';
-import Colors from '../Constants/Colors';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import {View} from 'react-native';
+import Icon from 'react-native-vector-icons/Foundation';
 import MonthPicker from 'react-native-month-year-picker';
 import * as AddDataActions from '../Store/Actions/AddDataAction';
 import {useSelector, useDispatch} from 'react-redux';
+import {ScaledSheet, moderateScale} from 'react-native-size-matters';
 
 const MonthYearPicker = (props) => {
+  const monthYearFilterData = useSelector(
+    (state) => state.data.MonthYearFilter,
+  );
+
   const [show, setShow] = useState(false);
-  const [date, setDate] = useState(new Date());
+  // const [date, setDate] = useState(
+  //   new Date(monthYearFilterData.year, monthYearFilterData.month),
+  // );
+
+  console.log(
+    'Month year picker: ',
+    monthYearFilterData,
+    // date,
+    new Date(monthYearFilterData.year, monthYearFilterData.month),
+  );
 
   const showPicker = useCallback((value) => {
     setShow(value);
@@ -18,11 +31,13 @@ const MonthYearPicker = (props) => {
 
   const onValueChange = useCallback(
     (event, newDate) => {
-      const selectedDate = newDate || date;
+      const selectedDate =
+        newDate ||
+        new Date(monthYearFilterData.year, monthYearFilterData.month);
 
       console.log('Event picker :', event, newDate);
       showPicker(false);
-      setDate(selectedDate);
+      //setDate(selectedDate);
       dispatch(
         AddDataActions.updateMonthYearFilter(
           selectedDate.getMonth(),
@@ -30,23 +45,24 @@ const MonthYearPicker = (props) => {
         ),
       );
     },
-    [date, showPicker],
+    [showPicker, monthYearFilterData],
   );
 
   return (
     <View style={styles.leftIcon}>
       <Icon
-        name="today"
-        size={35}
-        color="grey"
+        name="calendar"
+        size={moderateScale(34)}
+        color="#DC143C"
         onPress={() => showPicker(true)}
       />
       {show ? (
         <MonthPicker
           onChange={onValueChange}
-          value={date}
-          //  minimumDate={new Date()}
-          //  maximumDate={new Date(2025, 5)}
+          value={new Date(monthYearFilterData.year, monthYearFilterData.month)}
+          mode="short"
+          //minimumDate={new Date(1900, 0)}
+          // maximumDate={new Date(1)}
           locale="en"
         />
       ) : null}
@@ -54,9 +70,9 @@ const MonthYearPicker = (props) => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = ScaledSheet.create({
   leftIcon: {
-    marginLeft: 20,
+    marginLeft: '20@ms',
   },
 });
 

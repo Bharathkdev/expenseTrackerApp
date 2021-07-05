@@ -1,4 +1,3 @@
-import {weekdays} from 'moment';
 import {
   LOAD_TRANSACTIONS_PER_MONTH,
   UPDATE_MONTH_YEAR_FILTER,
@@ -252,6 +251,7 @@ const AddDataReducer = (state = initialState, action) => {
             endDate: weeks[week][6]._d,
             income: weeklyIncome,
             expense: weeklyExpense,
+            weekDates: weeks[week],
           };
         }
       } else {
@@ -261,6 +261,7 @@ const AddDataReducer = (state = initialState, action) => {
             endDate: weeks[week][6]._d,
             income: 0,
             expense: 0,
+            weekDates: weeks[week],
           };
         }
       }
@@ -298,7 +299,7 @@ const AddDataReducer = (state = initialState, action) => {
           for (let weekDays in weeksInCalendar[week]) {
             let weeklyMonth = weeksInCalendar[week][weekDays]._d.getMonth();
             let weekDay = weeksInCalendar[week][weekDays]._d.toDateString();
-            let details = {},
+            let details = [],
               dailyIncome = 0,
               dailyExpense = 0;
             console.log('Week data: ', weeklyMonth, weekDay, calendarYear);
@@ -340,7 +341,7 @@ const AddDataReducer = (state = initialState, action) => {
           for (let weekDays in weeksInCalendar[week]) {
             let weekDay = weeksInCalendar[week][weekDays]._d.toDateString();
             updatedCalendarTransactions[weekDay] = {
-              details: {},
+              details: [],
               income: 0,
               expense: 0,
             };
@@ -393,6 +394,8 @@ const AddDataReducer = (state = initialState, action) => {
 
     case UPDATE_MONTH_ENABLE:
       const screen = action.monthEnable;
+
+      console.log('Month enable in redux: ', screen);
 
       return {
         ...state,

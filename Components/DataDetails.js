@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import * as AddDataActions from '../Store/Actions/AddDataAction';
+import {ScaledSheet, moderateScale} from 'react-native-size-matters';
 
 const DataDetails = (props) => {
   const dispatch = useDispatch();
@@ -151,17 +152,38 @@ const DataDetails = (props) => {
           : '',
       }}>
       {props.dataDetails.type == 'Transfer' ? (
-        <Text style={{flex: 1, color: 'grey'}}>Transfer</Text>
+        <Text
+          style={{
+            flex: 1,
+            color: 'grey',
+            fontSize: props.isCalendarView
+              ? moderateScale(11)
+              : moderateScale(12),
+          }}>
+          Transfer
+        </Text>
       ) : (
-        <Text style={{flex: 1, color: 'grey'}}>
-          {props.dataDetails.category.length > 10
-            ? props.dataDetails.category.substring(0, 9) + '...'
+        <Text
+          style={{
+            flex: 1,
+            color: 'grey',
+            fontSize: props.isCalendarView
+              ? moderateScale(11)
+              : moderateScale(12),
+          }}>
+          {props.isCalendarView
+            ? props.dataDetails.category.substring(0, 12) + '...'
             : props.dataDetails.category}
         </Text>
       )}
       {props.dataDetails.note.length != 0 ? (
         <View style={{flex: 1}}>
-          <Text>
+          <Text
+            style={{
+              fontSize: props.isCalendarView
+                ? moderateScale(11)
+                : moderateScale(12),
+            }}>
             {props.dataDetails.note.length > 10
               ? props.dataDetails.note.substring(
                   0,
@@ -170,23 +192,53 @@ const DataDetails = (props) => {
               : props.dataDetails.note}
           </Text>
           {props.dataDetails.type == 'Transfer' ? (
-            <Text style={{flex: 1, color: 'grey'}}>
+            <Text
+              style={{
+                flex: 1,
+                color: 'grey',
+                fontSize: props.isCalendarView
+                  ? moderateScale(9)
+                  : moderateScale(12),
+              }}>
               {props.dataDetails.payment} to {props.dataDetails.category}
             </Text>
           ) : (
-            <Text style={{flex: 1, paddingRight: 0, color: 'grey'}}>
+            <Text
+              style={{
+                flex: 1,
+                paddingRight: moderateScale(0),
+                color: 'grey',
+                fontSize: props.isCalendarView
+                  ? moderateScale(11)
+                  : moderateScale(12),
+              }}>
               {props.dataDetails.payment}
             </Text>
           )}
         </View>
       ) : (
-        <View style={{flex: 1, paddingTop: 0}}>
+        <View style={{flex: 1, paddingTop: moderateScale(0)}}>
           {props.dataDetails.type == 'Transfer' ? (
-            <Text style={{flex: 1, color: 'grey'}}>
+            <Text
+              style={{
+                flex: 1,
+                color: 'grey',
+                fontSize: props.isCalendarView
+                  ? moderateScale(11)
+                  : moderateScale(12),
+              }}>
               {props.dataDetails.payment} to {props.dataDetails.category}
             </Text>
           ) : (
-            <Text style={{flex: 1, paddingRight: 0, color: 'grey'}}>
+            <Text
+              style={{
+                flex: 1,
+                paddingRight: moderateScale(0),
+                color: 'grey',
+                fontSize: props.isCalendarView
+                  ? moderateScale(11)
+                  : moderateScale(12),
+              }}>
               {props.dataDetails.payment}
             </Text>
           )}
@@ -197,14 +249,14 @@ const DataDetails = (props) => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = ScaledSheet.create({
   detailsView: {
     // flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+    paddingVertical: '15@ms',
+    paddingHorizontal: '20@ms',
   },
 });
 

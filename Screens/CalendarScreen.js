@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import React, {useState, useRef, useCallback, useEffect} from 'react';
 import {View, Text, StyleSheet, FlatList, Button} from 'react-native';
 
 import {useSelector, useDispatch} from 'react-redux';
@@ -15,11 +15,12 @@ const CalendarScreen = (props) => {
   const [error, setError] = useState();
   const [isLoading, setIsLoading] = useState(false);
 
-  console.log('I am Screen Calendar');
-
   const monthYearFilterData = useSelector(
     (state) => state.data.MonthYearFilter,
   );
+
+  const monthData = props.navigation.getParam('month');
+  const yearData = props.navigation.getParam('year');
 
   const dispatch = useDispatch();
 
@@ -59,7 +60,26 @@ const CalendarScreen = (props) => {
 
   const dataFromRedux = useSelector((state) => state.data.dataItems);
 
-  const loadCalendarData = useCallback(async () => {
+  const loadDataForCalendar = useCallback(async () => {
+    setError(null);
+    setIsLoading(true);
+    try {
+      await dispatch(AddDataActions.fetchData());
+      dispatch(
+        AddDataActions.loadTransactionsCalendar(
+          getDaysInAMonth(monthYearFilterData.year, monthYearFilterData.month),
+          monthYearFilterData.year,
+          monthYearFilterData.month,
+        ),
+      );
+    } catch (error) {
+      setError(error.message);
+      console.log('Im calendar screen error: ', error.message);
+    }
+    setIsLoading(false);
+  }, [monthYearFilterData]);
+
+  const loadCalendarData = useCallback(() => {
     dispatch(
       AddDataActions.loadTransactionsCalendar(
         getDaysInAMonth(monthYearFilterData.year, monthYearFilterData.month),
@@ -67,14 +87,28 @@ const CalendarScreen = (props) => {
         monthYearFilterData.month,
       ),
     );
-  }, [dispatch, monthYearFilterData]);
+  }, [monthYearFilterData]);
+
+  const mounted = useRef();
 
   useEffect(() => {
-    if (props.isFocused) {
-      console.log('Calendar focused ');
-      loadCalendarData();
+    if (!mounted.current) {
+      mounted.current = true; //ComponentDidMount
+      loadDataForCalendar();
+    } else {
+      if (props.isFocused) {
+        dispatch(AddDataActions.updateMonthEnable('Calendar'));
+        loadCalendarData();
+        console.log('Calendar focused ');
+      }
     }
-  }, [dataFromRedux, monthYearFilterData, props.isFocused]);
+  }, [monthYearFilterData, dataFromRedux, props.isFocused]);
+
+  useEffect(() => {
+    if (monthData != undefined && yearData != undefined) {
+      dispatch(AddDataActions.updateMonthYearFilter(monthData, yearData));
+    }
+  }, [monthData, yearData]);
 
   const dataItems = useSelector((state) => {
     const transformedDataItems = [];
@@ -113,7 +147,7 @@ const CalendarScreen = (props) => {
         <Button
           title="Try Again"
           color={Colors.primaryColor}
-          onPress={loadCalendarData}
+          onPress={loadDataForCalendar}
         />
       </View>
     );
@@ -144,7 +178,6 @@ const CalendarScreen = (props) => {
         data={dataItems}
         numColumns={7}
         renderItem={(itemData) => {
-          console.log('Item data in calendar screen:', itemData.item);
           return (
             <CalendarGridComponent
               key={new Date().getTime()}

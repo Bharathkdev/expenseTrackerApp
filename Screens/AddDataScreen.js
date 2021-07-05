@@ -1,12 +1,11 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Text,
   View,
-  StyleSheet,
-  ScrollView,
   TouchableOpacity,
+  BackHandler,
+  Dimensions,
 } from 'react-native';
-import {Dropdown} from 'react-native-material-dropdown';
 import {ScaledSheet, moderateScale} from 'react-native-size-matters';
 
 import {useSelector, useDispatch} from 'react-redux';
@@ -20,30 +19,32 @@ const AddDataScreen = (props) => {
   const year = new Date(date).getFullYear().toString();
   const month = new Date(date).getMonth().toString();
 
+  const windowWidth = Dimensions.get('window').width;
+  const windowHeight = Dimensions.get('window').height;
+
   const dispatch = useDispatch();
 
-  console.log('Im Add data Screen here');
-
-  console.log(
-    'DataID from add data screen: ',
-    dataID,
-    ' And date here: ',
-    date,
-    year,
-    month,
-  );
-
-  let details, index, dataFromRedux;
+  let details = {},
+    index = null,
+    dataFromRedux = {};
 
   const visibilityData = useSelector((state) => state.data.visibility);
+  const dataItemsFromRedux = useSelector((state) => state.data.dataItems);
 
-  if (date) {
+  if (
+    dataItemsFromRedux &&
+    dataID != null &&
+    date != null &&
+    year in dataItemsFromRedux &&
+    month in dataItemsFromRedux[year] &&
+    date in dataItemsFromRedux[year][month]
+  ) {
     dataFromRedux = useSelector(
       (state) => state.data.dataItems[year][month][date],
     );
   }
 
-  console.log('DataFromRedux: ', dataFromRedux);
+  console.log('Data From Redux : ', dataFromRedux);
 
   if (dataFromRedux) {
     const dateIdInRedux = Object.keys(dataFromRedux);
@@ -59,11 +60,11 @@ const AddDataScreen = (props) => {
     );
   }
 
-  const [type, setType] = useState(dataID && details ? details.type : 'Income');
-
   console.log('visibilty: ', visibilityData);
 
   console.log('Details already available in add data screen: ', details);
+
+  const [type, setType] = useState(dataID && details ? details.type : 'Income');
 
   const paymentItems = ['Cash', 'Account', 'Card'];
 
@@ -90,6 +91,21 @@ const AddDataScreen = (props) => {
     'Other',
   ];
 
+  const handleBackButtonClick = () => {
+    return true;
+  };
+
+  useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick,
+      );
+    };
+  }, []);
+
   useEffect(() => {
     props.navigation.setParams({
       title: type,
@@ -103,7 +119,7 @@ const AddDataScreen = (props) => {
   console.log('Type of data stored in add data screen: ', type);
 
   return (
-    <View style={{flex: 1, backgroundColor: 'white'}}>
+    <View style={{flex: moderateScale(1), backgroundColor: 'white'}}>
       <View style={styles.typeViewStyle}>
         <TouchableOpacity
           activeOpacity={0.5}
@@ -181,17 +197,19 @@ AddDataScreen.navigationOptions = (navData) => {
 
   return {
     headerTitle: () => (
-      <Text style={{fontSize: 20, fontFamily: 'OpenSans-Bold'}}> {title} </Text>
+      <Text style={{fontSize: moderateScale(17), fontFamily: 'OpenSans-Bold'}}>
+        {' '}
+        {title}{' '}
+      </Text>
     ),
     headerLeft: () => (
       <View style={styles.leftIcon}>
         <Icon
           name="keyboard-backspace"
-          size={35}
+          size={moderateScale(35)}
           color="grey"
           onPress={() => {
             navData.navigation.goBack();
-            console.log('visibility: ', visibilityData);
             dispatch(
               AddDataActions.updateVisibility(
                 true,
@@ -213,15 +231,15 @@ const styles = ScaledSheet.create({
   },
 
   leftIcon: {
-    marginLeft: 20,
+    marginLeft: '20@ms',
   },
 
   typeViewStyle: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    marginTop: 15,
-    marginHorizontal: 10,
+    marginTop: '15@ms',
+    marginHorizontal: '10@ms',
     // backgroundColor: 'white',
   },
 
@@ -230,7 +248,7 @@ const styles = ScaledSheet.create({
     borderRadius: '7@ms',
     borderColor: 'grey',
     paddingVertical: '5@ms',
-    paddingHorizontal: '30@ms',
+    paddingHorizontal: '29@ms',
   },
 });
 

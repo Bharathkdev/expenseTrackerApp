@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useRef, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -30,14 +30,37 @@ const MonthlyScreen = (props) => {
 
   const dispatch = useDispatch();
 
+  const loadDataForMonthly = useCallback(async () => {
+    setError(null);
+    setIsLoading(true);
+    try {
+      await dispatch(AddDataActions.fetchData());
+      dispatch(
+        AddDataActions.loadTransactionsPerYear(monthYearFilterData.year),
+      );
+    } catch (error) {
+      setError(error.message);
+      console.log('Im Monthly screen error: ', error.message);
+    }
+    setIsLoading(false);
+  }, [monthYearFilterData]);
+
   const loadYearlyData = useCallback(async () => {
     dispatch(AddDataActions.loadTransactionsPerYear(monthYearFilterData.year));
   }, [dispatch, monthYearFilterData]);
 
+  const mounted = useRef();
+
   useEffect(() => {
-    if (props.isFocused) {
-      console.log('Monthly focused ');
-      loadYearlyData();
+    if (!mounted.current) {
+      mounted.current = true; //ComponentDidMount
+      loadDataForMonthly();
+    } else {
+      if (props.isFocused) {
+        console.log('Monthly focused ');
+        dispatch(AddDataActions.updateMonthEnable('Monthly'));
+        loadYearlyData();
+      }
     }
   }, [monthYearFilterData, dataFromRedux, props.isFocused]);
 
@@ -79,7 +102,7 @@ const MonthlyScreen = (props) => {
         <Button
           title="Try Again"
           color={Colors.primaryColor}
-          onPress={loadYearlyData}
+          onPress={loadDataForMonthly}
         />
       </View>
     );
