@@ -24,18 +24,23 @@ const MonthlyTemplate = (props) => {
     (state) => state.data.MonthYearFilter,
   );
 
+  console.log(
+    'Im monthly template: ',
+    months.indexOf(props.month),
+    monthYearFilterData.year,
+  );
   const dispatch = useDispatch();
   return (
     <TouchableOpacity
-      activeOpacity={0.5}
+      activeOpacity={0.7}
       onPress={() => {
-        props.navigation.navigate('Daily');
-        dispatch(
-          AddDataActions.updateMonthYearFilter(
-            months.indexOf(props.month),
-            monthYearFilterData.year,
-          ),
-        );
+        props.navigation.navigate({
+          routeName: 'Calendar',
+          params: {
+            month: months.indexOf(props.month),
+            year: monthYearFilterData.year,
+          },
+        });
       }}>
       <View style={styles.monthContainer}>
         <View
@@ -60,10 +65,7 @@ const MonthlyTemplate = (props) => {
           </Text>
         </View>
         <View style={{flex: 1, alignItems: 'flex-end', paddingLeft: 10}}>
-          <Text
-            adjustsFontSizeToFit
-            numberOfLines={1}
-            style={{color: 'green', marginTop: 7}}>
+          <Text adjustsFontSizeToFit numberOfLines={1} style={{color: 'green'}}>
             {'\u20A8'} {props.dataDetails.income.toFixed(2)}
           </Text>
         </View>
@@ -74,10 +76,7 @@ const MonthlyTemplate = (props) => {
             paddingLeft: 10,
             paddingRight: 20,
           }}>
-          <Text
-            adjustsFontSizeToFit
-            numberOfLines={1}
-            style={{color: 'red', marginTop: 7}}>
+          <Text adjustsFontSizeToFit numberOfLines={1} style={{color: 'red'}}>
             {'\u20A8'} {props.dataDetails.expense.toFixed(2)}
           </Text>
         </View>
@@ -97,6 +96,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginVertical: 10,
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
 
   monthText: {

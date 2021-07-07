@@ -17,6 +17,7 @@ import Colors from '../Constants/Colors';
 import Icon from 'react-native-vector-icons/Ionicons';
 import TransactionsTopNavigator from '../Navigator/TransactionsTopNavigator';
 import * as AddDataActions from '../Store/Actions/AddDataAction';
+import {ScaledSheet, moderateScale} from 'react-native-size-matters';
 
 const TransactionsScreen = (props) => {
   const months = [
@@ -54,30 +55,22 @@ const TransactionsScreen = (props) => {
 
   console.log('Month year filter: ', monthYearFilterData);
 
-  useEffect(() => {
-    console.log('Edit screen: ', visibilityData);
-    props.navigation.setParams({visible: visibilityData.addDataVisible});
-    // if (visibilityData.editDataVisible) {
-    //     props.navigation.navigate('EditData');
-    // }
-  }, [visibilityData]);
+  console.log('Month enabled: ', monthEnable);
 
   useEffect(() => {
-    if (year) {
-      props.navigation.setParams({month: months[month], year: year});
-      dispatch(
-        AddDataActions.updateVisibility(true, visibilityData.editDataVisible),
-      );
-    } else {
-      props.navigation.setParams({
-        month: months[new Date().getMonth()],
-        year: new Date().getFullYear(),
-      });
-      dispatch(
-        AddDataActions.updateVisibility(true, visibilityData.editDataVisible),
-      );
-    }
-  }, [month, year, dispatch]);
+    console.log('Edit screen: ', visibilityData);
+    props.navigation.setParams({
+      visible: visibilityData.addDataVisible,
+      monthEnable: monthEnable.screen,
+    });
+  }, [visibilityData, monthEnable]);
+
+  useEffect(() => {
+    props.navigation.setParams({month: months[month], year: year});
+    dispatch(
+      AddDataActions.updateVisibility(true, visibilityData.editDataVisible),
+    );
+  }, [monthYearFilterData, dispatch]);
 
   return (
     <>
@@ -86,7 +79,7 @@ const TransactionsScreen = (props) => {
         <View style={styles.addIcon}>
           <Icon
             name="md-add-circle-sharp"
-            size={60}
+            size={moderateScale(60)}
             color={Colors.primaryColor}
             onPress={() => {
               console.log('Add data screen from add icon');
@@ -111,12 +104,16 @@ TransactionsScreen.navigationOptions = (navData) => {
   const monthHeader = navData.navigation.getParam('month');
   const yearHeader = navData.navigation.getParam('year');
   const visibility = navData.navigation.getParam('visible');
+  const enableMonth = navData.navigation.getParam('monthEnable');
 
   return {
     headerShown: visibility ? true : false,
+    headerTitleContainerStyle: {
+      left: enableMonth === 'Monthly' ? moderateScale(50) : moderateScale(55),
+    },
     headerTitle: () => (
       <Text style={styles.headerTextStyle}>
-        {monthHeader} {yearHeader}
+        {enableMonth === 'Monthly' ? null : monthHeader} {yearHeader}
       </Text>
     ),
     headerLeft: () => <MonthYearPicker />,
@@ -126,39 +123,24 @@ TransactionsScreen.navigationOptions = (navData) => {
   };
 };
 
-const styles = StyleSheet.create({
+const styles = ScaledSheet.create({
   container: {
-    flex: 1,
+    flex: '1@ms',
   },
 
   headerTextStyle: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: 20,
+    fontSize: '18@ms',
     fontFamily: 'OpenSans-Bold',
   },
 
-  backgroundImageStyle: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    opacity: 0.7,
-  },
-
   addIcon: {
-    //  borderWidth: 1,
-    // borderColor: 'rgba(0,0,0,0.2)',
     alignItems: 'center',
     justifyContent: 'center',
-    width: 70,
+    width: '70@ms',
     position: 'absolute',
-    bottom: 30,
-    right: 10,
-    height: 70,
-    //backgroundColor: 'white',
-    borderRadius: 100,
+    bottom: '30@ms',
+    right: '10@ms',
+    height: '70@ms',
   },
 });
 

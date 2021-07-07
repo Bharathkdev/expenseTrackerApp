@@ -8,7 +8,7 @@ import AddDataScreen from '../Screens/AddDataScreen';
 import EditDataScreen from '../Screens/EditDataScreen';
 import MonthlyScreen from '../Screens/MonthlyScreen';
 import CalendarScreen from '../Screens/CalendarScreen';
-import TotalScreen from '../Screens/TotalScreen';
+import {ScaledSheet, moderateScale} from 'react-native-size-matters';
 
 const DailyNavigator = createStackNavigator({
   Daily: {
@@ -53,22 +53,12 @@ const CalendarNavigator = createStackNavigator({
   },
 });
 
-const TotalNavigator = createStackNavigator({
-  Total: {
-    screen: TotalScreen,
-    navigationOptions: {
-      headerShown: false,
-    },
-  },
-});
-
 const TransactionsTopBar = createMaterialTopTabNavigator(
   {
-    Daily: DailyNavigator,
-    Calendar: CalendarNavigator,
-    Weekly: WeeklyNavigator,
-    Monthly: MonthlyNavigator,
-    Total: TotalNavigator,
+    Daily: DailyScreen,
+    Calendar: CalendarScreen,
+    Weekly: WeeklyScreen,
+    Monthly: MonthlyScreen,
   },
   {
     tabBarOptions: {
@@ -79,7 +69,7 @@ const TransactionsTopBar = createMaterialTopTabNavigator(
       },
       labelStyle: {
         fontFamily: 'OpenSans-Bold',
-        fontSize: 12,
+        fontSize: moderateScale(10),
       },
       showIcon: false,
       showLabel: true,
@@ -89,8 +79,9 @@ const TransactionsTopBar = createMaterialTopTabNavigator(
       },
     },
     lazy: true,
-    optimizationsEnabled: true,
+    //optimizationsEnabled: true,
     // removeClippedSubviews: true,
+    swipeEnabled: true,
   },
 );
 

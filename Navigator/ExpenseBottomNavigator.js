@@ -73,6 +73,7 @@ const BottomTabScreenConfig = {
         );
       },
       tabBarLabel: <Text style={{fontFamily: 'OpenSans-Bold'}}>Accounts</Text>,
+      // unmountOnBlur: true,
     },
   },
 };

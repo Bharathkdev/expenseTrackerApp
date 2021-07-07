@@ -1,18 +1,12 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {
-  View,
-  StyleSheet,
-  Text,
-  Button,
-  ActivityIndicator,
-  Alert,
-} from 'react-native';
+import {View, StyleSheet, Text, Button, Alert, BackHandler} from 'react-native';
 import DailyScreen from './DailyScreen';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useSelector, useDispatch} from 'react-redux';
 import * as AddDataActions from '../Store/Actions/AddDataAction';
 import Colors from '../Constants/Colors';
 import BouncingLoader from '../Components/BouncingLoader';
+import {moderateScale} from 'react-native-size-matters';
 
 const EditDataScreen = (props) => {
   console.log('Im the edit data screen');
@@ -84,6 +78,21 @@ const EditDataScreen = (props) => {
     props.navigation.setParams({deleteData: deleteMutipleData});
   }, [deleteMutipleData]);
 
+  const handleBackButtonClick = () => {
+    return true;
+  };
+
+  useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick,
+      );
+    };
+  }, []);
+
   if (error) {
     return (
       <View style={styles.centerLoader}>
@@ -103,10 +112,6 @@ const EditDataScreen = (props) => {
     );
   }
 
-  if (isLoading) {
-    return <BouncingLoader />;
-  }
-
   return (
     <>
       <View style={styles.textViewStyle}>
@@ -121,7 +126,7 @@ const EditDataScreen = (props) => {
           Rs. {totalAmount.toFixed(2)}
         </Text>
       </View>
-      <DailyScreen />
+      {isLoading ? <BouncingLoader /> : <DailyScreen />}
     </>
   );
 };
@@ -132,7 +137,9 @@ EditDataScreen.navigationOptions = (navData) => {
 
   return {
     headerTitle: () => (
-      <Text style={{fontSize: 20, fontFamily: 'OpenSans-Bold'}}>Edit</Text>
+      <Text style={{fontSize: moderateScale(18), fontFamily: 'OpenSans-Bold'}}>
+        Edit
+      </Text>
     ),
     // headerTintColor: 'white',  deleteBalanceAmountAllDateUpdate = deleteTotalIncomeAllDateUpdate - deleteTotalExpenseAllDateUpdate;
 

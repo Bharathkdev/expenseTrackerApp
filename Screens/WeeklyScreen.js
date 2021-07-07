@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useRef, useEffect, useCallback} from 'react';
 import {View, Text, StyleSheet, FlatList, Button} from 'react-native';
 
 import {useSelector, useDispatch} from 'react-redux';
@@ -59,6 +59,24 @@ const WeeklyScreen = (props) => {
     return calendar;
   };
 
+  const loadDataForWeekly = useCallback(async () => {
+    setError(null);
+    setIsLoading(true);
+    try {
+      await dispatch(AddDataActions.fetchData());
+      dispatch(
+        AddDataActions.loadTransactionsWeekly(
+          getDaysInAMonth(monthYearFilterData.year, monthYearFilterData.month),
+          monthYearFilterData.year,
+        ),
+      );
+    } catch (error) {
+      setError(error.message);
+      console.log('Im Weekly screen error: ', error.message);
+    }
+    setIsLoading(false);
+  }, [monthYearFilterData]);
+
   const loadWeeklyData = useCallback(async () => {
     dispatch(
       AddDataActions.loadTransactionsWeekly(
@@ -68,10 +86,18 @@ const WeeklyScreen = (props) => {
     );
   }, [dispatch, monthYearFilterData]);
 
+  const mounted = useRef();
+
   useEffect(() => {
-    if (props.isFocused) {
-      console.log('Weekly focused ');
-      loadWeeklyData();
+    if (!mounted.current) {
+      mounted.current = true; //ComponentDidMount
+      loadDataForWeekly();
+    } else {
+      if (props.isFocused) {
+        console.log('Weekly focused ');
+        dispatch(AddDataActions.updateMonthEnable('Weekly'));
+        loadWeeklyData();
+      }
     }
   }, [monthYearFilterData, dataFromRedux, props.isFocused]);
 
@@ -112,7 +138,7 @@ const WeeklyScreen = (props) => {
         <Button
           title="Try Again"
           color={Colors.primaryColor}
-          onPress={loadWeeklyData}
+          onPress={loadDataForWeekly}
         />
       </View>
     );

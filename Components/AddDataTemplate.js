@@ -188,7 +188,16 @@ const AddDataTemplate = (props) => {
     }
   }, [props.title]);
 
-  console.log('Data array amount: ', dataID ? props.details.amount : '0');
+  useEffect(() => {
+    console.log('After reducer and after came back add data screen called');
+    console.log('Navigation Handler effect and nav ====', nav);
+    if (nav) {
+      dispatch(
+        AddDataActions.updateVisibility(true, visibilityData.editDataVisible),
+      );
+      props.navigation.goBack();
+    }
+  }, [nav]);
 
   const [addDataState, dispatchAddDataState] = useReducer(dataReducer, {
     inputs: {
@@ -212,11 +221,7 @@ const AddDataTemplate = (props) => {
     formValidation: dataID ? true : false,
   });
 
-  console.log(
-    'Date entered_-------->',
-    addDataState.inputs.Date,
-    addDataState.inputs.Time,
-  );
+  console.log('Amount entered_-------->', addDataState.inputs.Amount);
   console.log('Details in Add data template: ', props.details);
 
   const textChangeHandler = useCallback(
@@ -233,10 +238,16 @@ const AddDataTemplate = (props) => {
             text.length - text.split('.')[1]?.length + 2,
           );
         }
+
+        if (isNaN(text) || text.includes(' ')) {
+          text = text.substring(0, text.length - 1);
+        }
+
         if (text.length > 15) {
           text = text.substring(0, 16);
         }
       }
+
       console.log('Im the text ', text);
       dispatchAddDataState({
         type: DATA_INPUT_UPDATE,
@@ -262,8 +273,6 @@ const AddDataTemplate = (props) => {
     const month = addDataState.inputs.Date.getMonth();
     const dateInString = addDataState.inputs.Date.toDateString();
 
-    //    console.log("template data: ", year, month, dateInString, typeof props.details.date);
-
     if (
       dataID &&
       new Date(props.details.date).toDateString() ==
@@ -284,17 +293,16 @@ const AddDataTemplate = (props) => {
             addDataState.inputs.Amount.length == 0
               ? 0.0
               : Math.round(parseFloat(addDataState.inputs.Amount) * 100) / 100,
-            addDataState.inputs.Note,
-            addDataState.inputs.Description,
+            addDataState.inputs.Note.trim(),
+            addDataState.inputs.Description.trim(),
           ),
         );
         await dispatch(AddDataActions.fetchData());
       } catch (error) {
         setError(error.message);
       }
-      setNav(true);
       setIsLoading(false);
-
+      setNav(true);
       console.log('After reducer add data screen called');
     } else if (dataID == null) {
       setError(null);
@@ -317,10 +325,11 @@ const AddDataTemplate = (props) => {
                 ? 0.0
                 : Math.round(parseFloat(addDataState.inputs.Amount) * 100) /
                     100,
-              addDataState.inputs.Note,
-              addDataState.inputs.Description,
+              addDataState.inputs.Note.trim(),
+              addDataState.inputs.Description.trim(),
             ),
           );
+          await dispatch(AddDataActions.fetchData());
         } else {
           await dispatch(
             AddDataActions.addData(
@@ -333,17 +342,18 @@ const AddDataTemplate = (props) => {
                 ? 0.0
                 : Math.round(parseFloat(addDataState.inputs.Amount) * 100) /
                     100,
-              addDataState.inputs.Note,
-              addDataState.inputs.Description,
+              addDataState.inputs.Note.trim(),
+              addDataState.inputs.Description.trim(),
             ),
           );
         }
         await dispatch(AddDataActions.fetchData());
       } catch (error) {
         setError(error.message);
+        console.log('error in add template: ', error.message);
       }
-      setNav(true);
       setIsLoading(false);
+      setNav(true);
     } else if (
       dataID &&
       new Date(props.details.date).toDateString() !=
@@ -365,8 +375,8 @@ const AddDataTemplate = (props) => {
             addDataState.inputs.Amount.length == 0
               ? 0.0
               : Math.round(parseFloat(addDataState.inputs.Amount) * 100) / 100,
-            addDataState.inputs.Note,
-            addDataState.inputs.Description,
+            addDataState.inputs.Note.trim(),
+            addDataState.inputs.Description.trim(),
           ),
         );
         await dispatch(AddDataActions.fetchData());
@@ -374,8 +384,8 @@ const AddDataTemplate = (props) => {
         setError(error.message);
         console.log('Im error for different dates: ', error.message);
       }
-      setNav(true);
       setIsLoading(false);
+      setNav(true);
     }
   };
 
@@ -389,27 +399,7 @@ const AddDataTemplate = (props) => {
     }
   };
 
-  useEffect(() => {
-    console.log('After reducer and after came back add data screen called');
-    console.log('Navigation Handler effect and nav ====', nav);
-    if (nav) {
-      dispatch(
-        AddDataActions.updateVisibility(true, visibilityData.editDataVisible),
-      );
-      props.navigation.goBack();
-    }
-  }, [nav]);
-
-  console.log(
-    'Date coming to add data screen: ',
-    !props.date ? addDataState.inputs.Date : new Date(props.date),
-  );
-
   return (
-    // <KeyboardAvoidingView
-    // behavior={"padding"}
-    // keyboardVerticalOffset = {40}
-    // style={{flex: 1}}>
     <View style={{flex: 1}}>
       <ScrollView style={{flex: 1}}>
         <View style={styles.container}>
@@ -548,7 +538,7 @@ const AddDataTemplate = (props) => {
                 showFocusNote();
               }}
               onBlur={hideFocusNote}
-              multiline={true}
+              //multiline={true}
               style={{
                 ...styles.textInput,
                 borderBottomColor: onFocusNote ? '#DC143C' : 'lightgrey',
@@ -598,6 +588,7 @@ const AddDataTemplate = (props) => {
         )}
         <View style={{height: 60}} />
       </ScrollView>
+
       {isPaymentModalVisible ? (
         <View style={styles.modalViewContainer}>
           <View style={styles.innerModalView}>

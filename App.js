@@ -6,24 +6,27 @@
  * @flow strict-local
  */
 
-import React from 'react';
-import {
-  StyleSheet
-} from 'react-native';
+import React, {useEffect} from 'react';
+import {StyleSheet} from 'react-native';
 
-import { combineReducers, createStore, applyMiddleware } from 'redux';
-import { Provider } from 'react-redux';
+import {combineReducers, createStore, applyMiddleware} from 'redux';
+import {Provider} from 'react-redux';
 import ExpenseNavigator from './Navigator/ExpenseBottomNavigator';
 import AddDataReducer from './Store/Reducers/AddDataReducer';
 import ReduxThunk from 'redux-thunk';
+import SplashScreen from 'react-native-lottie-splash-screen';
 
 const rootReducer = combineReducers({
-  data: AddDataReducer
+  data: AddDataReducer,
 });
 
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 
 const App: () => React$Node = () => {
+  useEffect(() => {
+    SplashScreen.hide();
+  }, []);
+
   return (
     <Provider store={store}>
       <ExpenseNavigator />
@@ -31,8 +34,6 @@ const App: () => React$Node = () => {
   );
 };
 
-const styles = StyleSheet.create({
-
-});
+const styles = StyleSheet.create({});
 
 export default App;

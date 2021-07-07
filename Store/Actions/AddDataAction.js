@@ -12,6 +12,8 @@ export const SET_DATA = 'SET_DATA';
 export const UPDATE_MONTH_ENABLE = 'UPDATE_MONTH_ENABLE';
 
 export const fetchData = () => {
+  console.log('this is why i am getting called Fetch data:(');
+
   return async (dispatch) => {
     const dataItemsResponse = await fetch(
       `https://money-manager-252627-default-rtdb.firebaseio.com/dataItems.json`,
@@ -835,12 +837,8 @@ export const deleteMultipleData = (deleteItems, year, month) => {
       deleteItems,
     );
     for await (const arr of deleteItems) {
-      // }
-      //await deleteItems.map(async (arr, pos) => {
       const index = arr.index;
       const date = arr.date;
-
-      //  console.log('Im Delete multiple data action called: ', pos);
 
       await dispatch(fetchData());
 
@@ -998,5 +996,6 @@ export const clearDataSelection = () => {
 };
 
 export const updateMonthEnable = (screen) => {
+  console.log('Im month enable action', screen);
   return {type: UPDATE_MONTH_ENABLE, monthEnable: screen};
 };
