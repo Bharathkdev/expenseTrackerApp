@@ -19,10 +19,13 @@ const CalendarScreen = (props) => {
     (state) => state.data.MonthYearFilter,
   );
 
+  const dataFromRedux = useSelector((state) => state.data.dataItems);
+
   const monthData = props.navigation.getParam('month');
   const yearData = props.navigation.getParam('year');
 
   const dispatch = useDispatch();
+  const mounted = useRef(true);
 
   const getDaysInAMonth = (
     year = +Moment().format('YYYY'),
@@ -58,25 +61,18 @@ const CalendarScreen = (props) => {
     return calendar;
   };
 
-  const dataFromRedux = useSelector((state) => state.data.dataItems);
-
   const loadDataForCalendar = useCallback(async () => {
     setError(null);
     setIsLoading(true);
     try {
       await dispatch(AddDataActions.fetchData());
-      dispatch(
-        AddDataActions.loadTransactionsCalendar(
-          getDaysInAMonth(monthYearFilterData.year, monthYearFilterData.month),
-          monthYearFilterData.year,
-          monthYearFilterData.month,
-        ),
-      );
     } catch (error) {
       setError(error.message);
       console.log('Im calendar screen error: ', error.message);
     }
-    setIsLoading(false);
+    if (mounted.current) {
+      setIsLoading(false);
+    }
   }, [monthYearFilterData]);
 
   const loadCalendarData = useCallback(() => {
@@ -89,20 +85,24 @@ const CalendarScreen = (props) => {
     );
   }, [monthYearFilterData]);
 
-  const mounted = useRef();
-
   useEffect(() => {
-    if (!mounted.current) {
-      mounted.current = true; //ComponentDidMount
-      loadDataForCalendar();
-    } else {
-      if (props.isFocused) {
-        dispatch(AddDataActions.updateMonthEnable('Calendar'));
-        loadCalendarData();
-        console.log('Calendar focused ');
-      }
+    if (props.isFocused) {
+      dispatch(AddDataActions.updateMonthEnable('Calendar'));
+      loadCalendarData();
+      console.log('Focused calendar');
     }
   }, [monthYearFilterData, dataFromRedux, props.isFocused]);
+
+  useEffect(() => {
+    if (mounted.current) {
+      //ComponentDidMount
+      loadDataForCalendar();
+    }
+
+    return function cleanup() {
+      mounted.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (monthData != undefined && yearData != undefined) {

@@ -29,40 +29,44 @@ const MonthlyScreen = (props) => {
   const dataFromRedux = useSelector((state) => state.data.dataItems);
 
   const dispatch = useDispatch();
+  const mounted = useRef(true);
 
   const loadDataForMonthly = useCallback(async () => {
     setError(null);
     setIsLoading(true);
     try {
       await dispatch(AddDataActions.fetchData());
-      dispatch(
-        AddDataActions.loadTransactionsPerYear(monthYearFilterData.year),
-      );
     } catch (error) {
       setError(error.message);
       console.log('Im Monthly screen error: ', error.message);
     }
-    setIsLoading(false);
+    if (mounted.current) {
+      setIsLoading(false);
+    }
   }, [monthYearFilterData]);
 
   const loadYearlyData = useCallback(async () => {
     dispatch(AddDataActions.loadTransactionsPerYear(monthYearFilterData.year));
-  }, [dispatch, monthYearFilterData]);
-
-  const mounted = useRef();
+  }, [monthYearFilterData]);
 
   useEffect(() => {
-    if (!mounted.current) {
-      mounted.current = true; //ComponentDidMount
-      loadDataForMonthly();
-    } else {
-      if (props.isFocused) {
-        console.log('Monthly focused ');
-        dispatch(AddDataActions.updateMonthEnable('Monthly'));
-        loadYearlyData();
-      }
+    if (props.isFocused) {
+      console.log('Focused monthly');
+      dispatch(AddDataActions.updateMonthEnable('Monthly'));
+      loadYearlyData();
     }
   }, [monthYearFilterData, dataFromRedux, props.isFocused]);
+
+  useEffect(() => {
+    if (mounted.current) {
+      //ComponentDidMount
+      loadDataForMonthly();
+    }
+
+    return function cleanup() {
+      mounted.current = false;
+    };
+  }, []);
 
   const dataItems = useSelector((state) => {
     const transformedDataItems = [];

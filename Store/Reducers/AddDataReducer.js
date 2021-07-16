@@ -128,14 +128,6 @@ const AddDataReducer = (state = initialState, action) => {
         'Dec',
       ];
 
-      console.log(
-        'monthly keys: ',
-        typeof yearly,
-        yearly,
-        typeof new Date().getFullYear(),
-        new Date().getFullYear(),
-      );
-
       let updatedYearlyTransaction = {},
         yearlyIncome = 0,
         yearlyExpense = 0,
@@ -144,13 +136,15 @@ const AddDataReducer = (state = initialState, action) => {
       if (state.dataItems && yearly in state.dataItems) {
         for (const month in months) {
           let monthlyIncome = 0,
-            monthlyExpense = 0;
+            monthlyExpense = 0,
+            details = [];
 
           if (month in state.dataItems[yearly]) {
             for (const key in state.dataItems[yearly][month]) {
               const dateID = Object.keys(state.dataItems[yearly][month][key]);
               const index = dateID[0];
 
+              details.push(state.dataItems[yearly][month][key][index].details);
               monthlyIncome +=
                 state.dataItems[yearly][month][key][index].totalIncome;
               monthlyExpense +=
@@ -162,6 +156,7 @@ const AddDataReducer = (state = initialState, action) => {
             }
             let monthKey = months[month];
             updatedYearlyTransaction[monthKey] = {
+              details,
               income: monthlyIncome,
               expense: monthlyExpense,
               year: yearly,
@@ -170,6 +165,7 @@ const AddDataReducer = (state = initialState, action) => {
           } else {
             let monthKey = months[month];
             updatedYearlyTransaction[monthKey] = {
+              details,
               income: 0,
               expense: 0,
               year: yearly,
@@ -178,17 +174,14 @@ const AddDataReducer = (state = initialState, action) => {
           }
         }
       } else {
-        if (yearly <= new Date().getFullYear()) {
-          for (let month of months) {
-            updatedYearlyTransaction[month] = {
-              income: 0,
-              expense: 0,
-              year: yearly,
-              month: month,
-            };
-          }
-        } else {
-          updatedYearlyTransaction = {};
+        for (let month of months) {
+          updatedYearlyTransaction[month] = {
+            details: [],
+            income: 0,
+            expense: 0,
+            year: yearly,
+            month: month,
+          };
         }
       }
 
@@ -302,13 +295,20 @@ const AddDataReducer = (state = initialState, action) => {
             let details = [],
               dailyIncome = 0,
               dailyExpense = 0;
-            console.log('Week data: ', weeklyMonth, weekDay, calendarYear);
-            if (weeklyMonth in state.dataItems[calendarYear]) {
+            console.log(
+              'Week datums: ',
+              state.dataItems,
+              weeklyMonth in state.dataItems[calendarYear],
+              state.dataItems[calendarYear][weeklyMonth],
+            );
+            if (state.dataItems[calendarYear][weeklyMonth]) {
               if (state.dataItems[calendarYear][weeklyMonth][weekDay]) {
                 const dateID = Object.keys(
                   state.dataItems[calendarYear][weeklyMonth][weekDay],
                 );
                 const index = dateID[0];
+
+                console.log('Im index of calendar: ', index);
 
                 if (weeklyMonth === calendarMonth) {
                   totalIncomeCalendar +=

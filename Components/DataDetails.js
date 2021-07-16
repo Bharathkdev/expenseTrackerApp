@@ -6,9 +6,6 @@ import {ScaledSheet, moderateScale} from 'react-native-size-matters';
 
 const DataDetails = (props) => {
   const dispatch = useDispatch();
-
-  const visibilityData = useSelector((state) => state.data.visibility);
-
   const selectedDataItems = useSelector(
     (state) => state.data.selectedDataItems,
   );
@@ -35,9 +32,7 @@ const DataDetails = (props) => {
           props.dataDetails.type,
         ),
       );
-      dispatch(
-        AddDataActions.updateVisibility(false, visibilityData.editDataVisible),
-      );
+      dispatch(AddDataActions.updateVisibility(false, true));
       props.navigation.navigate({
         routeName: 'EditData',
         params: {
@@ -73,9 +68,7 @@ const DataDetails = (props) => {
   };
 
   const onPressActionCall = () => {
-    dispatch(
-      AddDataActions.updateVisibility(false, visibilityData.editDataVisible),
-    );
+    dispatch(AddDataActions.updateVisibility(false, true));
   };
 
   const onPressHandler = () => {
@@ -108,7 +101,10 @@ const DataDetails = (props) => {
         adjustsFontSizeToFit
         numberOfLines={1}
         style={{flex: 1, color: 'green', textAlign: 'right'}}>
-        {'\u20A8'} {props.dataDetails.amount.toFixed(2)}
+        {'\u20A8'}{' '}
+        {props.dataDetails.amount
+          .toFixed(2)
+          .replace(/\B(?=(?:(\d\d)+(\d)(?!\d))+(?!\d))/g, ',')}
       </Text>
     );
   } else if (props.dataDetails.type == 'Expense') {
@@ -117,7 +113,10 @@ const DataDetails = (props) => {
         adjustsFontSizeToFit
         numberOfLines={1}
         style={{flex: 1, color: 'red', textAlign: 'right'}}>
-        {'\u20A8'} {props.dataDetails.amount.toFixed(2)}
+        {'\u20A8'}{' '}
+        {props.dataDetails.amount
+          .toFixed(2)
+          .replace(/\B(?=(?:(\d\d)+(\d)(?!\d))+(?!\d))/g, ',')}
       </Text>
     );
   } else {
@@ -126,7 +125,10 @@ const DataDetails = (props) => {
         adjustsFontSizeToFit
         numberOfLines={1}
         style={{flex: 1, color: 'black', textAlign: 'right'}}>
-        {'\u20A8'} {props.dataDetails.amount.toFixed(2)}
+        {'\u20A8'}{' '}
+        {props.dataDetails.amount
+          .toFixed(2)
+          .replace(/\B(?=(?:(\d\d)+(\d)(?!\d))+(?!\d))/g, ',')}
       </Text>
     );
   }
@@ -148,7 +150,7 @@ const DataDetails = (props) => {
       style={{
         ...styles.detailsView,
         backgroundColor: selectedDataItemsHandler(props.dataDetails.id)
-          ? 'lightblue'
+          ? '#FDE5DF'
           : '',
       }}>
       {props.dataDetails.type == 'Transfer' ? (
@@ -172,7 +174,9 @@ const DataDetails = (props) => {
               : moderateScale(12),
           }}>
           {props.isCalendarView
-            ? props.dataDetails.category.substring(0, 12) + '...'
+            ? props.dataDetails.category.length > 12
+              ? props.dataDetails.category.substring(0, 12) + '...'
+              : props.dataDetails.category
             : props.dataDetails.category}
         </Text>
       )}

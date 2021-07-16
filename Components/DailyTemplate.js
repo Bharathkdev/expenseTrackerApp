@@ -11,7 +11,7 @@ import DataDetails from './DataDetails';
 import * as AddDataActions from '../Store/Actions/AddDataAction';
 
 const DailyTemplate = (props) => {
-  console.log('Im the daily template');
+  console.log('Im the daily template', props.ref);
   var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   const dispatch = useDispatch();
@@ -67,7 +67,7 @@ const DailyTemplate = (props) => {
   console.log('Is calendar view: ', props.isCalendarView);
 
   return (
-    <View style={{paddingHorizontal: props.isCalendarView ? 10 : 0, flex: 1}}>
+    <View style={{paddingHorizontal: props.isCalendarView ? 5 : 0, flex: 1}}>
       <TouchableOpacity
         onPress={onPressHandler}
         style={styles.expensesContainer}>
@@ -133,7 +133,10 @@ const DailyTemplate = (props) => {
         {Object.keys(props.dataDetails).length != 0 ? (
           <View style={{flex: 1, paddingLeft: 10}}>
             <Text numberOfLines={1} style={{color: 'green'}}>
-              {'\u20A8'} {props.totalIncome.toFixed(2)}
+              {'\u20A8'}{' '}
+              {props.totalIncome
+                .toFixed(2)
+                .replace(/\B(?=(?:(\d\d)+(\d)(?!\d))+(?!\d))/g, ',')}
             </Text>
           </View>
         ) : null}
@@ -146,7 +149,10 @@ const DailyTemplate = (props) => {
               paddingRight: 20,
             }}>
             <Text numberOfLines={1} style={{color: 'red'}}>
-              {'\u20A8'} {props.totalExpense.toFixed(2)}
+              {'\u20A8'}{' '}
+              {props.totalExpense
+                .toFixed(2)
+                .replace(/\B(?=(?:(\d\d)+(\d)(?!\d))+(?!\d))/g, ',')}
             </Text>
           </View>
         ) : null}

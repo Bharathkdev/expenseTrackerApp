@@ -14,21 +14,27 @@ const CommonAmountHeader = (props) => {
         <View style={{alignItems: 'center', flex: 1, paddingHorizontal: 10}}>
           <Text>Income</Text>
           <Text adjustsFontSizeToFit numberOfLines={1} style={{color: 'green'}}>
-            {props.totalIncomeAllDate.toFixed(2)}
+            {props.totalIncomeAllDate
+              .toFixed(2)
+              .replace(/\B(?=(?:(\d\d)+(\d)(?!\d))+(?!\d))/g, ',')}
           </Text>
         </View>
 
         <View style={{alignItems: 'center', flex: 1}}>
           <Text>Expense</Text>
           <Text adjustsFontSizeToFit numberOfLines={1} style={{color: 'red'}}>
-            {props.totalExpenseAllDate.toFixed(2)}
+            {props.totalExpenseAllDate
+              .toFixed(2)
+              .replace(/\B(?=(?:(\d\d)+(\d)(?!\d))+(?!\d))/g, ',')}
           </Text>
         </View>
 
         <View style={{alignItems: 'center', flex: 1, paddingHorizontal: 10}}>
           <Text>Balance</Text>
           <Text adjustsFontSizeToFit numberOfLines={1} style={{color: 'black'}}>
-            {props.balanceAmountAllDate.toFixed(2)}
+            {props.balanceAmountAllDate
+              .toFixed(2)
+              .replace(/\B(?=(?:(\d\d)+(\d)(?!\d))+(?!\d))/g, ',')}
           </Text>
         </View>
       </View>

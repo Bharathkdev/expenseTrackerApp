@@ -12,6 +12,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import AddDataComponent from '../Components/AddDataTemplate';
 import * as AddDataActions from '../Store/Actions/AddDataAction';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {withNavigationFocus} from 'react-navigation';
 
 const AddDataScreen = (props) => {
   const dataID = props.navigation.getParam('dataID');
@@ -32,38 +33,29 @@ const AddDataScreen = (props) => {
   const dataItemsFromRedux = useSelector((state) => state.data.dataItems);
 
   if (
-    dataItemsFromRedux &&
+    Object.keys(dataItemsFromRedux).length != 0 &&
     dataID != null &&
     date != null &&
-    year in dataItemsFromRedux &&
-    month in dataItemsFromRedux[year] &&
-    date in dataItemsFromRedux[year][month]
+    dataItemsFromRedux[year] &&
+    dataItemsFromRedux[year][month] &&
+    dataItemsFromRedux[year][month][date]
   ) {
-    dataFromRedux = useSelector(
-      (state) => state.data.dataItems[year][month][date],
-    );
+    dataFromRedux = dataItemsFromRedux[year][month][date];
   }
 
-  console.log('Data From Redux : ', dataFromRedux);
-
-  if (dataFromRedux) {
+  if (Object.keys(dataFromRedux).length != 0) {
     const dateIdInRedux = Object.keys(dataFromRedux);
 
     index = dateIdInRedux[0];
   }
 
-  if (dataID != null && date != null) {
-    details = useSelector((state) =>
-      state.data.dataItems[year][month][date][index].details.find(
-        (data) => data.id == dataID,
-      ),
+  if (index) {
+    details = dataItemsFromRedux[year][month][date][index].details.find(
+      (data) => data.id == dataID,
     );
   }
 
-  console.log('visibilty: ', visibilityData);
-
-  console.log('Details already available in add data screen: ', details);
-
+  console.log('Add data screen details: ', details);
   const [type, setType] = useState(dataID && details ? details.type : 'Income');
 
   const paymentItems = ['Cash', 'Account', 'Card'];
@@ -114,17 +106,25 @@ const AddDataScreen = (props) => {
     });
   }, [type, visibilityData, dispatch]);
 
-  // props.navigation.setParams({ dispatch: dispatch });
-
-  console.log('Type of data stored in add data screen: ', type);
+  // useEffect(() => {
+  //   if (!props.isFocused) {
+  //     props.navigation.popToTop(1);
+  //   }
+  // }, [props.isFocused]);
 
   return (
     <View style={{flex: moderateScale(1), backgroundColor: 'white'}}>
-      <View style={styles.typeViewStyle}>
+      <View
+        style={{
+          ...styles.typeViewStyle,
+          marginTop: windowHeight * 0.02,
+          marginHorizontal: windowWidth * 0.01,
+        }}>
         <TouchableOpacity
           activeOpacity={0.5}
           style={{
             ...styles.typeStyle,
+            width: (windowWidth - moderateScale(30)) / 3,
             borderColor: type === 'Income' ? '#1E90FF' : 'grey',
           }}
           onPress={() => {
@@ -134,6 +134,8 @@ const AddDataScreen = (props) => {
             style={{
               color: type === 'Income' ? '#1E90FF' : 'grey',
               fontFamily: 'OpenSans-Bold',
+              textAlign: 'center',
+              fontSize: moderateScale(12),
             }}>
             Income
           </Text>
@@ -142,6 +144,7 @@ const AddDataScreen = (props) => {
           activeOpacity={0.5}
           style={{
             ...styles.typeStyle,
+            width: (windowWidth - moderateScale(30)) / 3,
             borderColor: type === 'Expense' ? '#DC143C' : 'grey',
           }}
           onPress={() => {
@@ -151,6 +154,8 @@ const AddDataScreen = (props) => {
             style={{
               color: type === 'Expense' ? '#DC143C' : 'grey',
               fontFamily: 'OpenSans-Bold',
+              textAlign: 'center',
+              fontSize: moderateScale(12),
             }}>
             Expense
           </Text>
@@ -159,6 +164,7 @@ const AddDataScreen = (props) => {
           activeOpacity={0.5}
           style={{
             ...styles.typeStyle,
+            width: (windowWidth - moderateScale(30)) / 3,
             borderColor: type === 'Transfer' ? 'black' : 'grey',
           }}
           onPress={() => {
@@ -168,16 +174,19 @@ const AddDataScreen = (props) => {
             style={{
               color: type === 'Transfer' ? 'black' : 'grey',
               fontFamily: 'OpenSans-Bold',
+              textAlign: 'center',
+              fontSize: moderateScale(12),
             }}>
             Transfer
           </Text>
         </TouchableOpacity>
       </View>
+
       <AddDataComponent
         title={type}
         date={date}
         details={details}
-        dataID={details ? dataID : null}
+        dataID={Object.keys(dataFromRedux).length != 0 ? dataID : null}
         paymentItems={paymentItems}
         categoryItemsIncome={categoryItemsIncome}
         categoryItemsExpense={categoryItemsExpense}
@@ -192,8 +201,6 @@ AddDataScreen.navigationOptions = (navData) => {
   const title = navData.navigation.getParam('title');
   const dispatch = navData.navigation.getParam('dispatch');
   const visibilityData = navData.navigation.getParam('visibilityData');
-
-  console.log('visibility: ', visibilityData);
 
   return {
     headerTitle: () => (
@@ -237,9 +244,9 @@ const styles = ScaledSheet.create({
   typeViewStyle: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    alignItems: 'center',
-    marginTop: '15@ms',
-    marginHorizontal: '10@ms',
+    //alignItems: 'center',
+    // marginTop: '15@ms',
+    // marginHorizontal: '10@ms',
     // backgroundColor: 'white',
   },
 
@@ -248,7 +255,7 @@ const styles = ScaledSheet.create({
     borderRadius: '7@ms',
     borderColor: 'grey',
     paddingVertical: '5@ms',
-    paddingHorizontal: '29@ms',
+    // paddingHorizontal: '29@ms',
   },
 });
 

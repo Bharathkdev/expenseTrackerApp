@@ -8,23 +8,19 @@ import React, {
 import {
   Text,
   View,
-  StyleSheet,
   TextInput,
   Alert,
   TouchableOpacity,
   ActivityIndicator,
-  Button,
-  KeyboardAvoidingView,
   ScrollView,
   FlatList,
+  Dimensions,
 } from 'react-native';
 import CustomButton from './CustomButton';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 
 import {useSelector, useDispatch} from 'react-redux';
 import * as AddDataActions from '../Store/Actions/AddDataAction';
-import {Dropdown} from 'react-native-material-dropdown';
-import Colors from '../Constants/Colors';
 import {ScaledSheet, moderateScale} from 'react-native-size-matters';
 import Icon from 'react-native-vector-icons/Entypo';
 import CustomModalGridView from './CustomModalGridView';
@@ -85,8 +81,8 @@ const AddDataTemplate = (props) => {
   const [onFocusDescription, setOnFocusDescription] = useState(false);
 
   const dataItems = useSelector((state) => state.data.dataItems);
-  const visibilityData = useSelector((state) => state.data.visibility);
-
+  const windowWidth = Dimensions.get('window').width;
+  const windowHeight = Dimensions.get('window').height;
   const showDatePicker = () => {
     console.log('Show date picker');
     setDatePickerVisibility(true);
@@ -192,9 +188,8 @@ const AddDataTemplate = (props) => {
     console.log('After reducer and after came back add data screen called');
     console.log('Navigation Handler effect and nav ====', nav);
     if (nav) {
-      dispatch(
-        AddDataActions.updateVisibility(true, visibilityData.editDataVisible),
-      );
+      dispatch(AddDataActions.updateVisibility(true, false));
+
       props.navigation.goBack();
     }
   }, [nav]);
@@ -209,7 +204,10 @@ const AddDataTemplate = (props) => {
       Time: dataID ? new Date(props.details.time) : new Date(),
       Payment: dataID ? props.details.payment : '',
       Category: dataID ? props.details.category : '',
-      Amount: dataID ? props.details.amount.toFixed(2) : '0.00',
+      Amount: dataID
+        ? props.details.amount.toFixed(2)
+        : // .replace(/\B(?=(?:(\d\d)+(\d)(?!\d))+(?!\d))/g, ',')
+          '',
       Note: dataID ? props.details.note : '',
       Description: dataID ? props.details.description : '',
     },
@@ -243,6 +241,13 @@ const AddDataTemplate = (props) => {
           text = text.substring(0, text.length - 1);
         }
 
+        if (
+          text.length != 1 &&
+          text.charAt(0) === '0' &&
+          text.charAt(1) != '.'
+        ) {
+          text = text.slice(1, text.length);
+        }
         if (text.length > 15) {
           text = text.substring(0, 16);
         }
@@ -402,7 +407,7 @@ const AddDataTemplate = (props) => {
   return (
     <View style={{flex: 1}}>
       <ScrollView style={{flex: 1}}>
-        <View style={styles.container}>
+        <View style={{...styles.container, width: windowWidth}}>
           <View style={styles.leftContainer}>
             <Text style={{paddingBottom: 40, color: 'grey'}}>Date*</Text>
             {transfer ? (
@@ -418,7 +423,7 @@ const AddDataTemplate = (props) => {
             <Text style={{paddingBottom: 30, color: 'grey'}}>Amount</Text>
             <Text style={{color: 'grey'}}>Note</Text>
           </View>
-          <View style={styles.rightContainer}>
+          <View style={{...styles.rightContainer, width: windowWidth / 1.4}}>
             <View style={styles.dateAndTime}>
               <TouchableOpacity
                 onPress={() => {
@@ -516,20 +521,32 @@ const AddDataTemplate = (props) => {
                 hidePaymentModal();
               }}
               onBlur={hideFocusAmount}
-              // onTouchStart={() => {
-              //   hideCategoryodal();
-              //   hidePaymentModal();
-              // }}
+              placeholder="0.00"
               keyboardType="decimal-pad"
+              //caretHidden={true}
               style={{
                 ...styles.textInput,
                 borderBottomColor: onFocusAmount ? '#DC143C' : 'lightgrey',
-                marginTop: moderateScale(13),
+                borderBottomWidth: 1,
                 paddingBottom: moderateScale(0),
+                marginTop: moderateScale(15),
               }}
               value={addDataState.inputs.Amount}
               onChangeText={textChangeHandler.bind(this, 'Amount')}
             />
+            <TouchableOpacity
+              style={{
+                position: 'absolute',
+                marginTop: moderateScale(150),
+                marginLeft: moderateScale(240),
+              }}>
+              <Icon
+                name="circle-with-cross"
+                size={moderateScale(20)}
+                color="black"
+                onPress={textChangeHandler.bind(this, 'Amount', '')}
+              />
+            </TouchableOpacity>
             <TextInput
               {...props}
               onFocus={() => {
@@ -541,6 +558,7 @@ const AddDataTemplate = (props) => {
               //multiline={true}
               style={{
                 ...styles.textInput,
+                borderBottomWidth: moderateScale(1),
                 borderBottomColor: onFocusNote ? '#DC143C' : 'lightgrey',
                 marginTop: moderateScale(10),
                 paddingBottom: moderateScale(0),

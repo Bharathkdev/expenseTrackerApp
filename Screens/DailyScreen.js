@@ -2,11 +2,8 @@ import React, {useState, useRef, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   FlatList,
   Button,
-  ActivityIndicator,
-  Image,
   ImageBackground,
   TouchableOpacity,
 } from 'react-native';
@@ -17,7 +14,7 @@ import Popover from 'react-native-popover-view';
 import {useSelector, useDispatch} from 'react-redux';
 import DailyTemplate from '../Components/DailyTemplate';
 import * as AddDataActions from '../Store/Actions/AddDataAction';
-import {withNavigation, withNavigationFocus} from 'react-navigation';
+import {withNavigationFocus} from 'react-navigation';
 import CommonAmountHeader from '../Components/CommonAmountHeader';
 import BouncingLoader from '../Components/BouncingLoader';
 import {moderateScale, ScaledSheet} from 'react-native-size-matters';
@@ -32,8 +29,7 @@ const DailyScreen = (props) => {
   const dataFromRedux = useSelector((state) => state.data.dataItems);
 
   const dispatch = useDispatch();
-
-  let touchable;
+  const mounted = useRef(true);
 
   const monthYearFilterData = useSelector(
     (state) => state.data.MonthYearFilter,
@@ -41,7 +37,7 @@ const DailyScreen = (props) => {
 
   const visibilityData = useSelector((state) => state.data.visibility);
 
-  console.log('Coming from add data screen ', monthYearFilterData);
+  console.log('Coming from add data screen ', new Date());
 
   const showPopover = () => {
     setIsVisible(true);
@@ -57,18 +53,14 @@ const DailyScreen = (props) => {
     try {
       console.log('Month year filters in add ', monthYearFilterData);
       await dispatch(AddDataActions.fetchData());
-      dispatch(
-        AddDataActions.loadTransactionsPerMonth(
-          monthYearFilterData.month,
-          monthYearFilterData.year,
-        ),
-      );
     } catch (error) {
       setError(error.message);
       console.log('Im daily screen error: ', error.message);
     }
-    setIsLoading(false);
-  }, [monthYearFilterData]);
+    if (mounted.current) {
+      setIsLoading(false);
+    }
+  }, [monthYearFilterData, props.isFocused]);
 
   const loadDailyData = useCallback(() => {
     dispatch(
@@ -77,21 +69,27 @@ const DailyScreen = (props) => {
         monthYearFilterData.year,
       ),
     );
-  }, [monthYearFilterData]);
+  }, [monthYearFilterData, props.isFocused]);
 
-  const mounted = useRef();
+  console.log('Useref in daily: ', mounted);
 
   useEffect(() => {
-    if (!mounted.current) {
-      mounted.current = true; //ComponentDidMount
-      loadDataForDaily();
-    } else {
-      if (props.isFocused) {
-        dispatch(AddDataActions.updateMonthEnable('Daily'));
-        loadDailyData(); //ComponentDidUpdate
-      }
+    if (props.isFocused) {
+      console.log('Focused daily');
+      dispatch(AddDataActions.updateMonthEnable('Daily'));
+      loadDailyData(); //ComponentDidUpdate
     }
   }, [monthYearFilterData, dataFromRedux, props.isFocused]);
+
+  useEffect(() => {
+      console.log('Im daily mounted'); //ComponentDidMount
+      loadDataForDaily();
+    
+
+    return function cleanup() {
+      mounted.current = false;
+    };
+  }, []);
 
   const dataItems = useSelector((state) => {
     const transformedDataItems = [];
@@ -129,9 +127,9 @@ const DailyScreen = (props) => {
     balanceAmountAllDate,
   );
 
-  useEffect(() => {
-    props.navigation.navigate('Transactions');
-  }, [visibilityData]);
+  // useEffect(() => {
+  //   props.navigation.navigate('Transactions');
+  // }, [visibilityData]);
 
   console.log('Fiinal array here-------->', dataItems, ' ', dataItems.length);
 
@@ -161,7 +159,6 @@ const DailyScreen = (props) => {
         totalExpenseAllDate={totalExpenseAllDate}
         balanceAmountAllDate={balanceAmountAllDate}
       />
-
       {isLoading ? (
         <BouncingLoader />
       ) : dataItems.length === 0 ? (
@@ -200,31 +197,31 @@ const DailyScreen = (props) => {
           }}
         />
       )}
-
-      <Popover
-        isVisible={isVisible}
-        from={
-          <TouchableOpacity style={styles.infoStyle}>
-            <Icon
-              ref={(ref) => (touchable = ref)}
-              name="info"
-              size={moderateScale(30)}
-              color={Colors.primaryColor}
-              renderToHardwareTextureAndroid={true}
-              collapsable={false}
-              onPress={showPopover}
-            />
-          </TouchableOpacity>
-        }
-        onRequestClose={closePopover}>
-        <Text
-          style={{
-            paddingVertical: moderateScale(5),
-            paddingHorizontal: moderateScale(10),
-          }}>
-          Long press an item(s) to delete
-        </Text>
-      </Popover>
+      {visibilityData.editDataVisible ? null : (
+        <Popover
+          isVisible={isVisible}
+          from={
+            <TouchableOpacity style={styles.infoStyle}>
+              <Icon
+                name="info"
+                size={moderateScale(30)}
+                color="black"
+                renderToHardwareTextureAndroid={true}
+                collapsable={false}
+                onPress={showPopover}
+              />
+            </TouchableOpacity>
+          }
+          onRequestClose={closePopover}>
+          <Text
+            style={{
+              paddingVertical: moderateScale(5),
+              paddingHorizontal: moderateScale(10),
+            }}>
+            Long press an item(s) to delete
+          </Text>
+        </Popover>
+      )}
     </View>
   );
 };

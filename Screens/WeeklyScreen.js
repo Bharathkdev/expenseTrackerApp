@@ -9,7 +9,7 @@ import {extendMoment} from 'moment-range';
 import * as AddDataActions from '../Store/Actions/AddDataAction';
 import Colors from '../Constants/Colors';
 import BouncingLoader from '../Components/BouncingLoader';
-import {withNavigationFocus, withNavigation} from 'react-navigation';
+import {withNavigationFocus} from 'react-navigation';
 
 const WeeklyScreen = (props) => {
   const [error, setError] = useState();
@@ -24,6 +24,7 @@ const WeeklyScreen = (props) => {
   const dataFromRedux = useSelector((state) => state.data.dataItems);
 
   const dispatch = useDispatch();
+  const mounted = useRef(true);
 
   const getDaysInAMonth = (
     year = +Moment().format('YYYY'),
@@ -64,17 +65,13 @@ const WeeklyScreen = (props) => {
     setIsLoading(true);
     try {
       await dispatch(AddDataActions.fetchData());
-      dispatch(
-        AddDataActions.loadTransactionsWeekly(
-          getDaysInAMonth(monthYearFilterData.year, monthYearFilterData.month),
-          monthYearFilterData.year,
-        ),
-      );
     } catch (error) {
       setError(error.message);
       console.log('Im Weekly screen error: ', error.message);
     }
-    setIsLoading(false);
+    if (mounted.current) {
+      setIsLoading(false);
+    }
   }, [monthYearFilterData]);
 
   const loadWeeklyData = useCallback(async () => {
@@ -86,20 +83,24 @@ const WeeklyScreen = (props) => {
     );
   }, [dispatch, monthYearFilterData]);
 
-  const mounted = useRef();
-
   useEffect(() => {
-    if (!mounted.current) {
-      mounted.current = true; //ComponentDidMount
-      loadDataForWeekly();
-    } else {
-      if (props.isFocused) {
-        console.log('Weekly focused ');
-        dispatch(AddDataActions.updateMonthEnable('Weekly'));
-        loadWeeklyData();
-      }
+    if (props.isFocused) {
+      console.log('Focused weekly');
+      dispatch(AddDataActions.updateMonthEnable('Weekly'));
+      loadWeeklyData();
     }
   }, [monthYearFilterData, dataFromRedux, props.isFocused]);
+
+  useEffect(() => {
+    if (mounted.current) {
+      //ComponentDidMount
+      loadDataForWeekly();
+    }
+
+    return function cleanup() {
+      mounted.current = false;
+    };
+  }, []);
 
   const dataItems = useSelector((state) => {
     const transformedDataItems = [];
@@ -159,7 +160,7 @@ const WeeklyScreen = (props) => {
         keyExtractor={(item) => item.week}
         data={dataItems}
         renderItem={(itemData) => {
-          console.log('Item data in monthly screen:', itemData.item);
+          console.log('Item data in weekly screen:', itemData.item);
           return (
             <WeeklyTemplate
               key={new Date().getTime()}
