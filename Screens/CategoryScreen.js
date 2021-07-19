@@ -39,6 +39,7 @@ const CategoryScreen = (props) => {
   const dispatch = useDispatch();
 
   const title = props.navigation.getParam('category');
+  const type = props.navigation.getParam('type');
   const dataFromRedux = useSelector((state) => state.data.dataItems);
 
   let monthlyTotalAmount = 0,
@@ -51,6 +52,7 @@ const CategoryScreen = (props) => {
 
   useEffect(() => {
     if (props.isFocused) {
+      dispatch(AddDataActions.updateMonthEnable('Category'));
       loadCategoryData();
     }
   }, [props.isFocused, dataFromRedux, monthYearFilterData]);
@@ -161,6 +163,7 @@ const CategoryScreen = (props) => {
           year={monthYearFilterData.year}
           total={yearlyTotalAmount}
           chartData={chartData}
+          type={type}
         />
       </View>
       <View
@@ -184,6 +187,7 @@ const CategoryScreen = (props) => {
                 <DailyTemplate
                   key={new Date().getTime()}
                   date={itemData.item.date}
+                  category={title}
                   dataDetails={itemData.item.dataDetails}
                   totalIncome={itemData.item.totalIncome}
                   totalExpense={itemData.item.totalExpense}

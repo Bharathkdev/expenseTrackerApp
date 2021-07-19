@@ -5,6 +5,7 @@ import MonthPicker from 'react-native-month-year-picker';
 import * as AddDataActions from '../Store/Actions/AddDataAction';
 import {useSelector, useDispatch} from 'react-redux';
 import {ScaledSheet, moderateScale} from 'react-native-size-matters';
+import Colors from '../Constants/Colors';
 
 const MonthYearPicker = (props) => {
   const monthYearFilterData = useSelector(
@@ -53,7 +54,7 @@ const MonthYearPicker = (props) => {
       <Icon
         name="calendar"
         size={moderateScale(34)}
-        color="#DC143C"
+        color={Colors.primaryColor}
         onPress={() => showPicker(true)}
       />
       {show ? (

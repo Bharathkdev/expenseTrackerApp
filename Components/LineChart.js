@@ -31,7 +31,10 @@ const LineChart = (props) => {
     <View>
       <VictoryChart
         domain={props.total === 0 ? {y: [0, 6]} : {}}
-        domainPadding={{y: 30, x: 20}}
+        domainPadding={{
+          y: props.total < 0 ? moderateScale(50) : moderateScale(50),
+          x: 20,
+        }}
         theme={VictoryTheme.material}
         style={{
           parent: {
@@ -68,7 +71,11 @@ const LineChart = (props) => {
           standalone={false}
           dependentAxis
           tickFormat={(tick) =>
-            tick < 0 ? `-${converter(Math.abs(tick))}` : `${converter(tick)}`
+            tick === 0
+              ? '0'
+              : tick < 0
+              ? `-${converter(Math.abs(tick))}`
+              : `${converter(tick)}`
           }
           style={{
             tickLabels: {fontSize: moderateScale(9), padding: moderateScale(5)},
@@ -81,31 +88,38 @@ const LineChart = (props) => {
           y="total"
           style={{
             data: {
-              stroke: 'tomato',
+              stroke: props.type === 'Income' ? '#1E90FF' : 'tomato',
               strokeWidth: 2,
             },
           }}
         />
 
         <VictoryScatter
-          labels={({datum}) => `Rs ${datum.total.toFixed(2)}`}
+          labels={({datum}) =>
+            datum.total < 0
+              ? `-${converter(Math.abs(datum.total))}`
+              : `${converter(datum.total)}`
+          }
           labelComponent={
             <VictoryTooltip
               renderInPortal={false}
               cornerRadius={5}
-              flyoutStyle={{fill: 'tomato', stroke: 'tomato'}}
+              flyoutStyle={{
+                fill: props.type === 'Income' ? '#1E90FF' : 'tomato',
+                stroke: props.type === 'Income' ? '#1E90FF' : 'tomato',
+              }}
               flyoutPadding={{
-                top: moderateScale(8),
-                bottom: moderateScale(8),
-                left: moderateScale(8),
-                right: moderateScale(8),
+                top: moderateScale(6),
+                bottom: moderateScale(6),
+                left: moderateScale(5),
+                right: moderateScale(5),
               }}
               constrainToVisibleArea
             />
           }
           style={{
             data: {
-              stroke: 'tomato',
+              stroke: props.type === 'Income' ? '#1E90FF' : 'tomato',
               strokeWidth: 2,
               fill: 'white',
             },

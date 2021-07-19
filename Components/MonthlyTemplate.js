@@ -49,7 +49,7 @@ const MonthlyTemplate = (props) => {
             borderColor:
               props.dataDetails.year == new Date().getFullYear() &&
               props.dataDetails.month == new Date().getMonth()
-                ? '#DC143C'
+                ? 'tomato'
                 : 'grey',
           }}>
           <Text
@@ -58,7 +58,7 @@ const MonthlyTemplate = (props) => {
               color:
                 props.dataDetails.year == new Date().getFullYear() &&
                 props.dataDetails.month == new Date().getMonth()
-                  ? '#DC143C'
+                  ? 'tomato'
                   : 'black',
             }}>
             {props.month}

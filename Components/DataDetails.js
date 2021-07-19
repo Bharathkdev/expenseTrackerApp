@@ -10,6 +10,8 @@ const DataDetails = (props) => {
     (state) => state.data.selectedDataItems,
   );
 
+  const visibilityData = useSelector((state) => state.data.visibility);
+
   console.log('selected items length: ', selectedDataItems);
 
   let amount;
@@ -68,7 +70,9 @@ const DataDetails = (props) => {
   };
 
   const onPressActionCall = () => {
-    dispatch(AddDataActions.updateVisibility(false, true));
+    dispatch(
+      AddDataActions.updateVisibility(false, visibilityData.editDataVisible),
+    );
   };
 
   const onPressHandler = () => {
@@ -100,7 +104,11 @@ const DataDetails = (props) => {
       <Text
         adjustsFontSizeToFit
         numberOfLines={1}
-        style={{flex: 1, color: 'green', textAlign: 'right'}}>
+        style={{
+          flex: 1,
+          color: 'green',
+          textAlign: 'right',
+        }}>
         {'\u20A8'}{' '}
         {props.dataDetails.amount
           .toFixed(2)
@@ -174,14 +182,22 @@ const DataDetails = (props) => {
               : moderateScale(12),
           }}>
           {props.isCalendarView
-            ? props.dataDetails.category.length > 12
-              ? props.dataDetails.category.substring(0, 12) + '...'
+            ? props.dataDetails.category.length > 10
+              ? props.dataDetails.category.substring(0, 10) + '...'
               : props.dataDetails.category
+            : props.dataDetails.category.length > 12
+            ? props.dataDetails.category.substring(0, 12) + '...'
             : props.dataDetails.category}
         </Text>
       )}
       {props.dataDetails.note.length != 0 ? (
-        <View style={{flex: 1}}>
+        <View
+          style={{
+            flex: 1,
+            paddingTop: props.isCalendarView
+              ? moderateScale(1.5)
+              : moderateScale(0),
+          }}>
           <Text
             style={{
               fontSize: props.isCalendarView
@@ -221,7 +237,13 @@ const DataDetails = (props) => {
           )}
         </View>
       ) : (
-        <View style={{flex: 1, paddingTop: moderateScale(0)}}>
+        <View
+          style={{
+            flex: 1,
+            paddingTop: props.isCalendarView
+              ? moderateScale(1.5)
+              : moderateScale(0),
+          }}>
           {props.dataDetails.type == 'Transfer' ? (
             <Text
               style={{
@@ -255,11 +277,10 @@ const DataDetails = (props) => {
 
 const styles = ScaledSheet.create({
   detailsView: {
-    // flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: '15@ms',
+    paddingVertical: '10@ms',
     paddingHorizontal: '20@ms',
   },
 });

@@ -1,31 +1,32 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity} from 'react-native';
+import {Dimensions, Text, TouchableOpacity} from 'react-native';
 import Colors from '../Constants/Colors';
+import {ScaledSheet, moderateScale} from 'react-native-size-matters';
 
-const CustomButton = props => {
-    return (
-        <TouchableOpacity onPress = {props.onSave} style = {{...props.style, ...styles.buttonView}}>
-            <Text style = {styles.applyTextStyle}>{props.children}</Text>
-        </TouchableOpacity>
-    );
+const CustomButton = (props) => {
+  const windowWidth = Dimensions.get('window').width;
+  return (
+    <TouchableOpacity
+      onPress={props.onSave}
+      activeOpacity={0.7}
+      style={{...props.style, ...styles.buttonView, width: windowWidth * 0.85}}>
+      <Text style={styles.applyTextStyle}>{props.children}</Text>
+    </TouchableOpacity>
+  );
 };
 
-const styles = StyleSheet.create({
-    buttonView: {
-        backgroundColor: Colors.primaryColor,
-        borderRadius: 20,
-        padding: 10,
-        width: "50%",
-        alignItems: 'center',
-        elevation: 5
-    },
+const styles = ScaledSheet.create({
+  buttonView: {
+    borderRadius: '10@ms',
+    padding: '10@ms',
+  },
 
-    applyTextStyle: {
-        fontSize: 20,
-        color: Colors.accentColor,
-        fontFamily: 'OpenSans-Regular',
-        textAlign: 'center'
-    },
+  applyTextStyle: {
+    fontSize: '16@ms',
+    color: Colors.accentColor,
+    fontFamily: 'OpenSans-Regular',
+    textAlign: 'center',
+  },
 });
 
 export default CustomButton;

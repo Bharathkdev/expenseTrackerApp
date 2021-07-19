@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect, useCallback} from 'react';
-import {View, Text, StyleSheet, FlatList, Button} from 'react-native';
+import {View, Text, FlatList, Button, ImageBackground} from 'react-native';
 
 import {useSelector, useDispatch} from 'react-redux';
 import CommonAmountHeader from '../Components/CommonAmountHeader';
@@ -10,6 +10,7 @@ import * as AddDataActions from '../Store/Actions/AddDataAction';
 import Colors from '../Constants/Colors';
 import BouncingLoader from '../Components/BouncingLoader';
 import {withNavigationFocus} from 'react-navigation';
+import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 
 const WeeklyScreen = (props) => {
   const [error, setError] = useState();
@@ -128,23 +129,41 @@ const WeeklyScreen = (props) => {
 
   if (error) {
     return (
-      <View style={styles.centerLoader}>
-        <Text style={{color: 'grey'}}>
-          {error === 'Network request failed' ? (
-            <Text>Check your Internet Connectivity</Text>
-          ) : (
-            <Text>An error occured!!</Text>
-          )}
-        </Text>
-        <Button
-          title="Try Again"
-          color={Colors.primaryColor}
-          onPress={loadDataForWeekly}
-        />
+      <View style={{...styles.centerLoader, backgroundColor: 'white'}}>
+        {error === 'Network request failed' ? (
+          <ImageBackground
+            style={styles.noNetworkImage}
+            resizeMode="contain"
+            source={require('../assets/images/noInternet.jpg')}>
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                marginBottom: moderateScale(70),
+              }}>
+              <Button
+                title="Reload"
+                color={Colors.primaryColor}
+                onPress={loadDataForWeekly}
+              />
+            </View>
+          </ImageBackground>
+        ) : (
+          <>
+            <Text style={{marginBottom: moderateScale(10)}}>
+              Something went wrong!!
+            </Text>
+            <Button
+              title="Reload"
+              color={Colors.primaryColor}
+              onPress={loadDataForWeekly}
+            />
+          </>
+        )}
       </View>
     );
   }
-
   if (isLoading) {
     return <BouncingLoader />;
   }
@@ -174,9 +193,15 @@ const WeeklyScreen = (props) => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = ScaledSheet.create({
   container: {
     backgroundColor: 'white',
+  },
+
+  noNetworkImage: {
+    height: '100%',
+    width: '100%',
+    marginBottom: '100@ms',
   },
 
   centerLoader: {

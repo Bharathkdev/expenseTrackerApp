@@ -14,7 +14,8 @@ import MonthlyTemplate from '../Components/MonthlyTemplate';
 import * as AddDataActions from '../Store/Actions/AddDataAction';
 import Colors from '../Constants/Colors';
 import BouncingLoader from '../Components/BouncingLoader';
-import {withNavigationFocus, withNavigation} from 'react-navigation';
+import {withNavigationFocus} from 'react-navigation';
+import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 
 const MonthlyScreen = (props) => {
   const [error, setError] = useState();
@@ -95,19 +96,38 @@ const MonthlyScreen = (props) => {
 
   if (error) {
     return (
-      <View style={styles.centerLoader}>
-        <Text style={{color: 'grey'}}>
-          {error === 'Network request failed' ? (
-            <Text>Check your Internet Connectivity</Text>
-          ) : (
-            <Text>An error occured!!</Text>
-          )}
-        </Text>
-        <Button
-          title="Try Again"
-          color={Colors.primaryColor}
-          onPress={loadDataForMonthly}
-        />
+      <View style={{...styles.centerLoader, backgroundColor: 'white'}}>
+        {error === 'Network request failed' ? (
+          <ImageBackground
+            style={styles.noNetworkImage}
+            resizeMode="contain"
+            source={require('../assets/images/noInternet.jpg')}>
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                marginBottom: moderateScale(70),
+              }}>
+              <Button
+                title="Reload"
+                color={Colors.primaryColor}
+                onPress={loadDataForMonthly}
+              />
+            </View>
+          </ImageBackground>
+        ) : (
+          <>
+            <Text style={{marginBottom: moderateScale(10)}}>
+              Something went wrong!!
+            </Text>
+            <Button
+              title="Reload"
+              color={Colors.primaryColor}
+              onPress={loadDataForMonthly}
+            />
+          </>
+        )}
       </View>
     );
   }
@@ -157,7 +177,7 @@ const MonthlyScreen = (props) => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = ScaledSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
@@ -167,6 +187,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  noNetworkImage: {
+    height: '100%',
+    width: '100%',
+    marginBottom: '100@ms',
   },
 
   image: {

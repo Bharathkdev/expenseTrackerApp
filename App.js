@@ -7,7 +7,6 @@
  */
 
 import React, {useEffect} from 'react';
-import {StyleSheet} from 'react-native';
 
 import {combineReducers, createStore, applyMiddleware} from 'redux';
 import {Provider} from 'react-redux';
@@ -33,7 +32,5 @@ const App: () => React$Node = () => {
     </Provider>
   );
 };
-
-const styles = StyleSheet.create({});
 
 export default App;

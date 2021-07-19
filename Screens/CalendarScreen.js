@@ -1,5 +1,12 @@
 import React, {useState, useRef, useCallback, useEffect} from 'react';
-import {View, Text, StyleSheet, FlatList, Button} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Button,
+  ImageBackground,
+} from 'react-native';
 
 import {useSelector, useDispatch} from 'react-redux';
 import CommonAmountHeader from '../Components/CommonAmountHeader';
@@ -10,6 +17,7 @@ import Moment from 'moment';
 import {extendMoment} from 'moment-range';
 import CalendarGridComponent from '../Components/CalendarGridComponent';
 import {withNavigationFocus, withNavigation} from 'react-navigation';
+import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 
 const CalendarScreen = (props) => {
   const [error, setError] = useState();
@@ -136,19 +144,38 @@ const CalendarScreen = (props) => {
 
   if (error) {
     return (
-      <View style={styles.centerLoader}>
-        <Text style={{color: 'grey'}}>
-          {error === 'Network request failed' ? (
-            <Text>Check your Internet Connectivity</Text>
-          ) : (
-            <Text>An error occured!!</Text>
-          )}
-        </Text>
-        <Button
-          title="Try Again"
-          color={Colors.primaryColor}
-          onPress={loadDataForCalendar}
-        />
+      <View style={{...styles.centerLoader, backgroundColor: 'white'}}>
+        {error === 'Network request failed' ? (
+          <ImageBackground
+            style={styles.noNetworkImage}
+            resizeMode="contain"
+            source={require('../assets/images/noInternet.jpg')}>
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                marginBottom: moderateScale(70),
+              }}>
+              <Button
+                title="Reload"
+                color={Colors.primaryColor}
+                onPress={loadDataForCalendar}
+              />
+            </View>
+          </ImageBackground>
+        ) : (
+          <>
+            <Text style={{marginBottom: moderateScale(10)}}>
+              Something went wrong!!
+            </Text>
+            <Button
+              title="Reload"
+              color={Colors.primaryColor}
+              onPress={loadDataForCalendar}
+            />
+          </>
+        )}
       </View>
     );
   }
@@ -194,7 +221,7 @@ const CalendarScreen = (props) => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = ScaledSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
@@ -206,8 +233,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
+  noNetworkImage: {
+    height: '100%',
+    width: '100%',
+    marginBottom: '100@ms',
+  },
+
   text: {
-    fontSize: 12,
+    fontSize: '12@ms',
     fontFamily: 'OpenSans-Regular',
   },
 

@@ -2,23 +2,37 @@ import React from 'react';
 import {Text} from 'react-native';
 import {createAppContainer, StackActions} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
-import {createMaterialBottomTabNavigator} from 'react-navigation-material-bottom-tabs';
+import {createBottomTabNavigator} from 'react-navigation-tabs';
 import TransactionsScreen from '../Screens/TransactionsScreen';
 import StatisticsScreen from '../Screens/StatisticsScreen';
 import AccountsScreen from '../Screens/AccountsScreen';
 import Colors from '../Constants/Colors';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AddDataScreen from '../Screens/AddDataScreen';
-import DailyScreen from '../Screens/DailyScreen';
-import WeeklyScreen from '../Screens/WeeklyScreen';
 import EditDataScreen from '../Screens/EditDataScreen';
 import CategoryScreen from '../Screens/CategoryScreen';
+import {moderateScale} from 'react-native-size-matters';
+import {useSelector} from 'react-redux';
 
 const TransactionsNavigator = createStackNavigator({
   Transactions: TransactionsScreen,
   AddData: AddDataScreen,
-  EditData: EditDataScreen,
 });
+
+TransactionsNavigator.navigationOptions = ({navigation}) => {
+  let tabBarVisible = true;
+
+  let routeName = navigation.state.routes[navigation.state.index].routeName;
+
+  if (routeName != 'Transactions') {
+    tabBarVisible = false;
+  }
+
+  return {
+    tabBarVisible,
+  };
+};
 
 const StatisticsNavigator = createStackNavigator({
   Statistics: StatisticsScreen,
@@ -26,6 +40,20 @@ const StatisticsNavigator = createStackNavigator({
   AddData: AddDataScreen,
   EditData: EditDataScreen,
 });
+
+StatisticsNavigator.navigationOptions = ({navigation}) => {
+  let tabBarVisible = true;
+
+  let routeName = navigation.state.routes[navigation.state.index].routeName;
+
+  if (routeName != 'Statistics') {
+    tabBarVisible = false;
+  }
+
+  return {
+    tabBarVisible,
+  };
+};
 
 const AccountsNavigator = createStackNavigator({
   Accounts: AccountsScreen,
@@ -37,21 +65,25 @@ const BottomTabScreenConfig = {
     navigationOptions: {
       tabBarIcon: (tabInfo) => {
         return (
-          <MaterialIcons
-            name="receipt-long"
-            size={20}
+          <MaterialCommunityIcons
+            name="bank-transfer"
+            size={moderateScale(28)}
             color={tabInfo.tintColor}
           />
         );
       },
-      tabBarLabel: (
-        <Text style={{fontFamily: 'OpenSans-Bold'}}>Transactions</Text>
+      tabBarLabel: (tabInfo) => (
+        <Text
+          style={{
+            textAlign: 'center',
+            fontFamily: 'OpenSans-Bold',
+            fontSize: 12,
+            color: tabInfo.tintColor,
+            paddingBottom: moderateScale(5),
+          }}>
+          Transactions
+        </Text>
       ),
-      // tabBarOnPress: ({navigation, defaultHandler}) => {
-      //   console.log('Im stack actions 2', defaultHandler);
-      //   navigation.navigate('Daily');
-      //   defaultHandler();
-      // },
     },
   },
 
@@ -59,27 +91,26 @@ const BottomTabScreenConfig = {
     screen: StatisticsNavigator,
     navigationOptions: ({navigation}) => ({
       tabBarIcon: (tabInfo) => {
-        const {routeName, routes, index} = navigation.state;
-        // console.log(
-        //   'Navigation onpress statistics: ',
-        //   navigation,
-        //   tabInfo,
-        //   tabInfo.focused,
-        //   navigation.state,
-        //   routeName,
-        // );
         return (
-          <MaterialIcons name="analytics" size={20} color={tabInfo.tintColor} />
+          <MaterialIcons
+            name="analytics"
+            size={moderateScale(20)}
+            color={tabInfo.tintColor}
+          />
         );
       },
-      tabBarLabel: (
-        <Text style={{fontFamily: 'OpenSans-Bold'}}>Statistics</Text>
+      tabBarLabel: (tabInfo) => (
+        <Text
+          style={{
+            textAlign: 'center',
+            fontFamily: 'OpenSans-Bold',
+            fontSize: 12,
+            color: tabInfo.tintColor,
+            paddingBottom: moderateScale(5),
+          }}>
+          Statistics
+        </Text>
       ),
-      // tabBarOnPress: ({navigation, defaultHandler}) => {
-      //   console.log('stack action 2 :', navigation.actions, StackActions);
-      //   navigation.actions.navigate('Accounts');
-      //   defaultHandler();
-      // },
     }),
   },
 
@@ -89,23 +120,38 @@ const BottomTabScreenConfig = {
       tabBarIcon: (tabInfo) => {
         return (
           <MaterialIcons
-            name="account-balance"
-            size={20}
+            name="account-balance-wallet"
+            size={moderateScale(20)}
             color={tabInfo.tintColor}
           />
         );
       },
-      tabBarLabel: <Text style={{fontFamily: 'OpenSans-Bold'}}>Accounts</Text>,
+      tabBarLabel: (tabInfo) => (
+        <Text
+          style={{
+            textAlign: 'center',
+            fontFamily: 'OpenSans-Bold',
+            fontSize: 12,
+            color: tabInfo.tintColor,
+            paddingBottom: moderateScale(5),
+          }}>
+          Accounts
+        </Text>
+      ),
     }),
   },
 };
 
-const BottomTabs = createMaterialBottomTabNavigator(BottomTabScreenConfig, {
-  activeColor: Colors.primaryColor,
-  //shifting: true, //gives the shifting effect
-  barStyle: {
-    backgroundColor: 'white',
+const BottomTabs = createBottomTabNavigator(BottomTabScreenConfig, {
+  tabBarOptions: {
+    activeTintColor: Colors.primaryColor,
+    style: {
+      backgroundColor: 'white',
+      paddingVertical: moderateScale(10),
+      height: moderateScale(55),
+    },
   },
+  // tabBarVisible: fetchVisibility ? false : true,
 });
 
 export default createAppContainer(BottomTabs);

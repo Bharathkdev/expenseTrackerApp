@@ -71,30 +71,19 @@ const TransactionsScreen = (props) => {
   useEffect(() => {
     if (props.isFocused) {
       props.navigation.setParams({month: months[month], year: year});
-      dispatch(
-        AddDataActions.updateVisibility(true, visibilityData.editDataVisible),
-      );
     }
   }, [monthYearFilterData, props.isFocused]);
 
-  // useEffect(() => {
-  //   dispatch(
-  //     AddDataActions.updateVisibility(true, visibilityData.editDataVisible),
-  //   );
-  // }, []);
-
-  // useEffect(() => {
-  //   if (props.isFocused) {
-  //     dispatch(
-  //       AddDataActions.updateVisibility(true, visibilityData.editDataVisible),
-  //     );
-  //   }
-  // }, [props.isFocused]);
+  useEffect(() => {
+    dispatch(
+      AddDataActions.updateVisibility(true, visibilityData.editDataVisible),
+    );
+  }, []);
 
   return (
     <>
       <TransactionsTopNavigator />
-      {visibilityData.addDataVisible ? (
+      {visibilityData.addDataVisible && monthEnable.screen != 'Category' ? (
         <View style={styles.addIcon}>
           <Icon
             name="md-add-circle-sharp"
@@ -125,8 +114,10 @@ TransactionsScreen.navigationOptions = (navData) => {
   const visibility = navData.navigation.getParam('visible');
   const enableMonth = navData.navigation.getParam('monthEnable');
 
+  console.log('Visibility: ', visibility, enableMonth);
+
   return {
-    headerShown: visibility ? true : false,
+    headerShown: visibility && enableMonth != 'Category' ? true : false,
     headerTitleContainerStyle: {
       left: enableMonth === 'Monthly' ? moderateScale(50) : moderateScale(55),
     },

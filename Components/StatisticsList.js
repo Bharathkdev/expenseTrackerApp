@@ -11,6 +11,7 @@ const StatisticsList = (props) => {
         onPress={() => {
           props.navigation.navigate('Category', {
             category: props.dataDetails.category,
+            type: props.type,
           });
         }}>
         <View

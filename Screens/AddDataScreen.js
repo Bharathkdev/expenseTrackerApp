@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   Text,
   View,
@@ -10,13 +10,11 @@ import {ScaledSheet, moderateScale} from 'react-native-size-matters';
 
 import {useSelector, useDispatch} from 'react-redux';
 import AddDataComponent from '../Components/AddDataTemplate';
-import * as AddDataActions from '../Store/Actions/AddDataAction';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import {withNavigationFocus} from 'react-navigation';
 
 const AddDataScreen = (props) => {
   const dataID = props.navigation.getParam('dataID');
   const date = props.navigation.getParam('date');
+  const category = props.navigation.getParam('category');
   const year = new Date(date).getFullYear().toString();
   const month = new Date(date).getMonth().toString();
 
@@ -24,6 +22,7 @@ const AddDataScreen = (props) => {
   const windowHeight = Dimensions.get('window').height;
 
   const dispatch = useDispatch();
+  const mounted = useRef(true);
 
   let details = {},
     index = null,
@@ -55,8 +54,9 @@ const AddDataScreen = (props) => {
     );
   }
 
-  console.log('Add data screen details: ', details);
   const [type, setType] = useState(dataID && details ? details.type : 'Income');
+
+  console.log('Add data screen details: ', details);
 
   const paymentItems = ['Cash', 'Account', 'Card'];
 
@@ -99,18 +99,18 @@ const AddDataScreen = (props) => {
   }, []);
 
   useEffect(() => {
+    return function cleanup() {
+      mounted.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
     props.navigation.setParams({
       title: type,
       dispatch: dispatch,
       visibilityData: visibilityData,
     });
   }, [type, visibilityData, dispatch]);
-
-  // useEffect(() => {
-  //   if (!props.isFocused) {
-  //     props.navigation.popToTop(1);
-  //   }
-  // }, [props.isFocused]);
 
   return (
     <View style={{flex: moderateScale(1), backgroundColor: 'white'}}>
@@ -185,12 +185,14 @@ const AddDataScreen = (props) => {
       <AddDataComponent
         title={type}
         date={date}
+        category={category}
         details={details}
-        dataID={Object.keys(dataFromRedux).length != 0 ? dataID : null}
+        dataID={Object.keys(details).length != 0 ? dataID : null}
         paymentItems={paymentItems}
         categoryItemsIncome={categoryItemsIncome}
         categoryItemsExpense={categoryItemsExpense}
         navigation={props.navigation}
+        mounted={mounted.current}
       />
     </View>
     //</ScrollView>
@@ -199,34 +201,16 @@ const AddDataScreen = (props) => {
 
 AddDataScreen.navigationOptions = (navData) => {
   const title = navData.navigation.getParam('title');
-  const dispatch = navData.navigation.getParam('dispatch');
-  const visibilityData = navData.navigation.getParam('visibilityData');
 
   return {
+    tabBarVisible: false,
     headerTitle: () => (
       <Text style={{fontSize: moderateScale(17), fontFamily: 'OpenSans-Bold'}}>
         {' '}
         {title}{' '}
       </Text>
     ),
-    headerLeft: () => (
-      <View style={styles.leftIcon}>
-        <Icon
-          name="keyboard-backspace"
-          size={moderateScale(35)}
-          color="grey"
-          onPress={() => {
-            navData.navigation.goBack();
-            dispatch(
-              AddDataActions.updateVisibility(
-                true,
-                visibilityData.editDataVisible,
-              ),
-            );
-          }}
-        />
-      </View>
-    ),
+    headerLeft: () => null,
   };
 };
 

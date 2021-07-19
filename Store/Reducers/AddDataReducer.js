@@ -205,7 +205,7 @@ const AddDataReducer = (state = initialState, action) => {
         totalExpenseWeekly = 0,
         balanceAmountWeekly = 0;
 
-      if (state.dataItems && weeklyYear in state.dataItems) {
+      if (state.dataItems && state.dataItems[weeklyYear]) {
         for (let week in weeks) {
           let weeklyIncome = 0,
             weeklyExpense = 0;
@@ -215,7 +215,7 @@ const AddDataReducer = (state = initialState, action) => {
             let weeklyMonth = weeks[week][weekDays]._d.getMonth();
             let weekDay = weeks[week][weekDays]._d.toDateString();
             console.log('Week data: ', weeklyMonth, weekDay, weeklyYear);
-            if (weeklyMonth in state.dataItems[weeklyYear]) {
+            if (state.dataItems[weeklyYear][weeklyMonth]) {
               //for (const key in state.dataItems[weeklyYear][weeklyMonth]) {
               if (state.dataItems[weeklyYear][weeklyMonth][weekDay]) {
                 //  if (weekDay === key) {
