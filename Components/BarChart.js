@@ -8,11 +8,8 @@ import {
   VictoryTooltip,
   VictoryTheme,
   VictoryChart,
-  VictoryVoronoiContainer,
   VictoryGroup,
   VictoryAxis,
-  VictoryLabel,
-  VictoryContainer,
 } from 'victory-native';
 
 const BarChart = (props) => {
@@ -20,6 +17,20 @@ const BarChart = (props) => {
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
   const chartData = props.chartData;
+  const monthInWords = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
 
   const converter = (n) => {
     if (n < 1e3) return n;
@@ -67,23 +78,10 @@ const BarChart = (props) => {
           }
           domainPadding={{y: 30, x: 20}}
           theme={VictoryTheme.material}
-          height={moderateScale(windowHeight / 2.35)}
+          height={moderateScale(windowHeight / 2.5)}
           width={windowWidth * 1.1}>
           <VictoryAxis
-            tickValues={[
-              'Jan',
-              'Feb',
-              'Mar',
-              'Apr',
-              'May',
-              'Jun',
-              'Jul',
-              'Aug',
-              'Sep',
-              'Oct',
-              'Nov',
-              'Dec',
-            ]}
+            tickValues={monthInWords}
             style={{
               tickLabels: {
                 fontSize: moderateScale(9),
@@ -147,7 +145,10 @@ const BarChart = (props) => {
               labelComponent={
                 <VictoryTooltip
                   active
-                  center={{x: 225, y: 45}}
+                  center={{
+                    x: moderateScale(195),
+                    y: moderateScale(35),
+                  }}
                   renderInPortal={false}
                   pointerOrientation="top"
                   flyoutStyle={{
@@ -156,8 +157,8 @@ const BarChart = (props) => {
                     stroke: 'none',
                   }}
                   flyoutPadding={{
-                    top: moderateScale(8),
-                    bottom: moderateScale(8),
+                    top: moderateScale(6),
+                    bottom: moderateScale(6),
                     left: moderateScale(8),
                     right: moderateScale(8),
                   }}
@@ -211,7 +212,10 @@ const BarChart = (props) => {
               labelComponent={
                 <VictoryTooltip
                   active
-                  center={{x: 225, y: 45}}
+                  center={{
+                    x: moderateScale(195),
+                    y: moderateScale(35),
+                  }}
                   renderInPortal={false}
                   pointerOrientation="top"
                   flyoutStyle={{
@@ -220,8 +224,8 @@ const BarChart = (props) => {
                     stroke: 'none',
                   }}
                   flyoutPadding={{
-                    top: moderateScale(8),
-                    bottom: moderateScale(8),
+                    top: moderateScale(6),
+                    bottom: moderateScale(6),
                     left: moderateScale(8),
                     right: moderateScale(8),
                   }}

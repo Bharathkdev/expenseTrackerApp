@@ -82,9 +82,8 @@ const DailyScreen = (props) => {
   }, [monthYearFilterData, dataFromRedux, props.isFocused]);
 
   useEffect(() => {
-      console.log('Im daily mounted'); //ComponentDidMount
-      loadDataForDaily();
-    
+    console.log('Im daily mounted'); //ComponentDidMount
+    loadDataForDaily();
 
     return function cleanup() {
       mounted.current = false;
@@ -118,36 +117,42 @@ const DailyScreen = (props) => {
     (state) => state.data.balanceAmountMonthly,
   );
 
-  console.log(
-    'TotalIncome Daily add Screen: ',
-    totalIncomeAllDate,
-    ' ',
-    totalExpenseAllDate,
-    ' ',
-    balanceAmountAllDate,
-  );
-
-  // useEffect(() => {
-  //   props.navigation.navigate('Transactions');
-  // }, [visibilityData]);
-
   console.log('Fiinal array here-------->', dataItems, ' ', dataItems.length);
 
   if (error) {
     return (
-      <View style={styles.centerLoader}>
-        <Text style={{color: 'grey'}}>
-          {error === 'Network request failed' ? (
-            <Text>Check your Internet Connectivity</Text>
-          ) : (
-            <Text>An error occured!!</Text>
-          )}
-        </Text>
-        <Button
-          title="Try Again"
-          color={Colors.primaryColor}
-          onPress={loadDataForDaily}
-        />
+      <View style={{...styles.centerLoader, backgroundColor: 'white'}}>
+        {error === 'Network request failed' ? (
+          <ImageBackground
+            style={styles.noNetworkImage}
+            resizeMode="contain"
+            source={require('../assets/images/noInternet.jpg')}>
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                marginBottom: moderateScale(70),
+              }}>
+              <Button
+                title="Reload"
+                color={Colors.primaryColor}
+                onPress={loadDataForDaily}
+              />
+            </View>
+          </ImageBackground>
+        ) : (
+          <>
+            <Text style={{marginBottom: moderateScale(10)}}>
+              Something went wrong!!
+            </Text>
+            <Button
+              title="Reload"
+              color={Colors.primaryColor}
+              onPress={loadDataForDaily}
+            />
+          </>
+        )}
       </View>
     );
   }
@@ -245,6 +250,12 @@ const styles = ScaledSheet.create({
   image: {
     height: '70%',
     width: '100%',
+  },
+
+  noNetworkImage: {
+    height: '100%',
+    width: '100%',
+    marginBottom: '100@ms',
   },
 
   centerLoader: {

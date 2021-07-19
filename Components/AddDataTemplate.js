@@ -8,8 +8,10 @@ import React, {
 import {
   Text,
   View,
+  Button,
   TextInput,
   Alert,
+  ImageBackground,
   TouchableOpacity,
   ActivityIndicator,
   ScrollView,
@@ -24,6 +26,8 @@ import * as AddDataActions from '../Store/Actions/AddDataAction';
 import {ScaledSheet, moderateScale} from 'react-native-size-matters';
 import Icon from 'react-native-vector-icons/Entypo';
 import CustomModalGridView from './CustomModalGridView';
+import Colors from '../Constants/Colors';
+import BouncingLoader from './BouncingLoader';
 
 const DATA_INPUT_UPDATE = 'DATA_INPUT_UPDATE';
 
@@ -81,8 +85,10 @@ const AddDataTemplate = (props) => {
   const [onFocusDescription, setOnFocusDescription] = useState(false);
 
   const dataItems = useSelector((state) => state.data.dataItems);
+  const visibilityData = useSelector((state) => state.data.visibility);
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
+  let color;
   const showDatePicker = () => {
     console.log('Show date picker');
     setDatePickerVisibility(true);
@@ -159,8 +165,6 @@ const AddDataTemplate = (props) => {
 
   const dataID = props.dataID;
 
-  // console.log("details in Add data screen::::::", typeof props.details.date, " ", props.details.date, " ", new Date(props.details.date), " ", typeof props.date, " ", props.date, " ", new Date(props.date));
-
   const mounted = useRef();
 
   console.log('UseRef: ', mounted.current);
@@ -203,7 +207,11 @@ const AddDataTemplate = (props) => {
         : new Date(),
       Time: dataID ? new Date(props.details.time) : new Date(),
       Payment: dataID ? props.details.payment : '',
-      Category: dataID ? props.details.category : '',
+      Category: dataID
+        ? props.details.category
+        : props.category
+        ? props.category
+        : '',
       Amount: dataID
         ? props.details.amount.toFixed(2)
         : // .replace(/\B(?=(?:(\d\d)+(\d)(?!\d))+(?!\d))/g, ',')
@@ -214,13 +222,12 @@ const AddDataTemplate = (props) => {
     inputValidations: {
       Date: true,
       Payment: dataID ? true : false,
-      Category: dataID ? true : false,
+      Category: dataID ? true : props.category ? true : false,
     },
     formValidation: dataID ? true : false,
   });
 
-  console.log('Amount entered_-------->', addDataState.inputs.Amount);
-  console.log('Details in Add data template: ', props.details);
+  console.log('Add dat details: ', addDataState.inputs);
 
   const textChangeHandler = useCallback(
     (identifier, text) => {
@@ -264,6 +271,13 @@ const AddDataTemplate = (props) => {
     [dispatchAddDataState],
   );
 
+  const backHandler = () => {
+    props.navigation.goBack();
+    dispatch(
+      AddDataActions.updateVisibility(true, visibilityData.editDataVisible),
+    );
+  };
+
   const saveHandler = async () => {
     if (!addDataState.formValidation) {
       Alert.alert('Alert', 'Please enter the mandatory fields', [
@@ -303,11 +317,13 @@ const AddDataTemplate = (props) => {
           ),
         );
         await dispatch(AddDataActions.fetchData());
+        setNav(true);
       } catch (error) {
         setError(error.message);
       }
-      setIsLoading(false);
-      setNav(true);
+      if (props.mounted) {
+        setIsLoading(false);
+      }
       console.log('After reducer add data screen called');
     } else if (dataID == null) {
       setError(null);
@@ -315,9 +331,9 @@ const AddDataTemplate = (props) => {
       try {
         if (
           dataItems &&
-          year in dataItems &&
-          month in dataItems[year] &&
-          dateInString in dataItems[year][month]
+          dataItems[year] &&
+          dataItems[year][month] &&
+          dataItems[year][month][dateInString]
         ) {
           await dispatch(
             AddDataActions.addDataInExistingDate(
@@ -335,6 +351,13 @@ const AddDataTemplate = (props) => {
             ),
           );
           await dispatch(AddDataActions.fetchData());
+          dispatch(
+            AddDataActions.updateMonthYearFilter(
+              addDataState.inputs.Date.getMonth(),
+              addDataState.inputs.Date.getFullYear(),
+            ),
+          );
+          setNav(true);
         } else {
           await dispatch(
             AddDataActions.addData(
@@ -353,12 +376,20 @@ const AddDataTemplate = (props) => {
           );
         }
         await dispatch(AddDataActions.fetchData());
+        dispatch(
+          AddDataActions.updateMonthYearFilter(
+            addDataState.inputs.Date.getMonth(),
+            addDataState.inputs.Date.getFullYear(),
+          ),
+        );
+        setNav(true);
       } catch (error) {
         setError(error.message);
         console.log('error in add template: ', error.message);
       }
-      setIsLoading(false);
-      setNav(true);
+      if (props.mounted) {
+        setIsLoading(false);
+      }
     } else if (
       dataID &&
       new Date(props.details.date).toDateString() !=
@@ -385,12 +416,20 @@ const AddDataTemplate = (props) => {
           ),
         );
         await dispatch(AddDataActions.fetchData());
+        dispatch(
+          AddDataActions.updateMonthYearFilter(
+            addDataState.inputs.Date.getMonth(),
+            addDataState.inputs.Date.getFullYear(),
+          ),
+        );
+        setNav(true);
       } catch (error) {
         setError(error.message);
         console.log('Im error for different dates: ', error.message);
       }
-      setIsLoading(false);
-      setNav(true);
+      if (props.mounted) {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -404,208 +443,316 @@ const AddDataTemplate = (props) => {
     }
   };
 
-  return (
-    <View style={{flex: 1}}>
-      <ScrollView style={{flex: 1}}>
-        <View style={{...styles.container, width: windowWidth}}>
-          <View style={styles.leftContainer}>
-            <Text style={{paddingBottom: 40, color: 'grey'}}>Date*</Text>
-            {transfer ? (
-              <Text style={{paddingBottom: 40, color: 'grey'}}>From*</Text>
-            ) : (
-              <Text style={{paddingBottom: 40, color: 'grey'}}>Payment*</Text>
-            )}
-            {transfer ? (
-              <Text style={{paddingBottom: 35, color: 'grey'}}>To*</Text>
-            ) : (
-              <Text style={{paddingBottom: 35, color: 'grey'}}>Category*</Text>
-            )}
-            <Text style={{paddingBottom: 30, color: 'grey'}}>Amount</Text>
-            <Text style={{color: 'grey'}}>Note</Text>
-          </View>
-          <View style={{...styles.rightContainer, width: windowWidth / 1.4}}>
-            <View style={styles.dateAndTime}>
-              <TouchableOpacity
-                onPress={() => {
-                  showDatePicker();
-                  hideCategoryodal();
-                  hidePaymentModal();
-                }}>
-                <Text style={{paddingRight: 20}}>
-                  {addDataState.inputs.Date.toDateString()}
-                </Text>
-              </TouchableOpacity>
-              <DateTimePicker
-                date={addDataState.inputs.Date}
-                //  style={{width: 320, backgroundColor: "white"}}
-                isVisible={isDatePickerVisible}
-                mode="date"
-                onConfirm={handleDateConfirm}
-                onCancel={hideDatePicker}
-                display="default"
-                // onChange = {onChange}
-              />
-              <TouchableOpacity
-                onPress={() => {
-                  showTimePicker();
-                  hideCategoryodal();
-                  hidePaymentModal();
-                }}>
-                <Text>
-                  {addDataState.inputs.Time.toLocaleTimeString().substring(
-                    0,
-                    5,
-                  )}
-                </Text>
-              </TouchableOpacity>
-              <DateTimePicker
-                date={addDataState.inputs.Time}
-                isVisible={isTimePickerVisible}
-                mode="time"
-                is24Hour={true}
-                display="default"
-                onConfirm={handleTimeConfirm}
-                onCancel={hideTimePicker}
+  if (props.title === 'Income') {
+    color = '#1E90FF';
+  } else if (props.title === 'Expense') {
+    color = '#DC143C';
+  } else {
+    color = 'black';
+  }
+
+  if (error) {
+    return (
+      <View style={styles.centerLoader}>
+        {error === 'Network request failed' ? (
+          <ImageBackground
+            style={styles.noNetworkImage}
+            resizeMode="contain"
+            source={require('../assets/images/noInternet.jpg')}>
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                marginBottom: moderateScale(100),
+              }}>
+              <Button
+                title="Go Back"
+                color={Colors.primaryColor}
+                onPress={backHandler}
               />
             </View>
-            <TouchableOpacity
-              onPress={() => {
-                displayPaymentModal();
-                hideCategoryodal();
-              }}
-              style={{
-                borderBottomWidth: 1,
-                marginTop: moderateScale(30),
-                borderColor: isPaymentModalVisible ? '#DC143C' : 'lightgrey',
-              }}>
-              <Text style={{paddingBottom: moderateScale(5)}}>
-                {addDataState.inputs.Payment}
-              </Text>
-            </TouchableOpacity>
-            {transfer ? (
-              <TouchableOpacity
-                onPress={() => {
-                  displayCategoryModal();
-                  hidePaymentModal();
-                }}
-                style={{
-                  borderBottomWidth: 1,
-                  marginTop: moderateScale(30),
-                  borderColor: isCategoryModalVisible ? '#DC143C' : 'lightgrey',
-                }}>
-                <Text style={{paddingBottom: moderateScale(5)}}>
-                  {addDataState.inputs.Category}
-                </Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                onPress={() => {
-                  displayCategoryModal();
-                  hidePaymentModal();
-                }}
-                style={{
-                  borderBottomWidth: 1,
-                  marginTop: moderateScale(30),
-                  borderColor: isCategoryModalVisible ? '#DC143C' : 'lightgrey',
-                }}>
-                <Text style={{paddingBottom: moderateScale(5)}}>
-                  {addDataState.inputs.Category}
-                </Text>
-              </TouchableOpacity>
-            )}
-            <TextInput
-              {...props}
-              onFocus={() => {
-                showFocusAmount();
-                hideCategoryodal();
-                hidePaymentModal();
-              }}
-              onBlur={hideFocusAmount}
-              placeholder="0.00"
-              keyboardType="decimal-pad"
-              //caretHidden={true}
-              style={{
-                ...styles.textInput,
-                borderBottomColor: onFocusAmount ? '#DC143C' : 'lightgrey',
-                borderBottomWidth: 1,
-                paddingBottom: moderateScale(0),
-                marginTop: moderateScale(15),
-              }}
-              value={addDataState.inputs.Amount}
-              onChangeText={textChangeHandler.bind(this, 'Amount')}
-            />
-            <TouchableOpacity
-              style={{
-                position: 'absolute',
-                marginTop: moderateScale(150),
-                marginLeft: moderateScale(240),
-              }}>
-              <Icon
-                name="circle-with-cross"
-                size={moderateScale(20)}
-                color="black"
-                onPress={textChangeHandler.bind(this, 'Amount', '')}
-              />
-            </TouchableOpacity>
-            <TextInput
-              {...props}
-              onFocus={() => {
-                hideCategoryodal();
-                hidePaymentModal();
-                showFocusNote();
-              }}
-              onBlur={hideFocusNote}
-              //multiline={true}
-              style={{
-                ...styles.textInput,
-                borderBottomWidth: moderateScale(1),
-                borderBottomColor: onFocusNote ? '#DC143C' : 'lightgrey',
-                marginTop: moderateScale(10),
-                paddingBottom: moderateScale(0),
-              }}
-              value={addDataState.inputs.Note}
-              onChangeText={textChangeHandler.bind(this, 'Note')}
-            />
-          </View>
-        </View>
-        <View
-          style={{
-            paddingTop: 25,
-            borderBottomColor: '#ECECEC',
-            borderBottomWidth: 10,
-          }}
-        />
-        <TextInput
-          {...props}
-          onFocus={() => {
-            hideCategoryodal();
-            hidePaymentModal();
-            showFocusDescription();
-          }}
-          onBlur={hideFocusDescription}
-          multiline={true}
-          placeholder="Description"
-          style={{
-            ...styles.textInput,
-            borderBottomColor: onFocusDescription ? '#DC143C' : 'lightgrey',
-            marginHorizontal: moderateScale(10),
-            marginTop: moderateScale(5),
-            paddingBottom: moderateScale(2),
-          }}
-          value={addDataState.inputs.Description}
-          onChangeText={textChangeHandler.bind(this, 'Description')}
-        />
-        {isLoading ? (
-          <View style={styles.loadingIndicatorStyle}>
-            <ActivityIndicator size="small" color="white" />
-          </View>
+          </ImageBackground>
         ) : (
-          <View style={styles.customButton}>
-            <CustomButton onSave={saveHandler}>Save</CustomButton>
-          </View>
+          <>
+            <Text style={{marginBottom: moderateScale(10)}}>
+              Something went wrong!!
+            </Text>
+            <Button
+              title="Go Back"
+              color={Colors.primaryColor}
+              onPress={backHandler}
+            />
+          </>
         )}
-        <View style={{height: 60}} />
-      </ScrollView>
+      </View>
+    );
+  }
+
+  return (
+    <View style={{flex: 1}}>
+      {isLoading ? (
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+          <BouncingLoader />
+        </View>
+      ) : (
+        <ScrollView style={{flex: 1}}>
+          <View style={{...styles.container}}>
+            <View
+              style={{
+                marginTop: moderateScale(windowHeight * 0.04),
+                marginHorizontal: moderateScale(windowWidth * 0.04),
+              }}>
+              <Text
+                style={{
+                  paddingBottom: moderateScale(windowWidth * 0.08),
+                  color: 'grey',
+                }}>
+                Date
+              </Text>
+              {transfer ? (
+                <Text
+                  style={{
+                    paddingBottom: moderateScale(windowWidth * 0.08),
+                    color: 'grey',
+                  }}>
+                  From*
+                </Text>
+              ) : (
+                <Text
+                  style={{
+                    paddingBottom: moderateScale(windowWidth * 0.08),
+                    color: 'grey',
+                  }}>
+                  Payment*
+                </Text>
+              )}
+              {transfer ? (
+                <Text
+                  style={{
+                    paddingBottom: moderateScale(windowWidth * 0.08),
+                    color: 'grey',
+                  }}>
+                  To*
+                </Text>
+              ) : (
+                <Text
+                  style={{
+                    paddingBottom: moderateScale(windowWidth * 0.08),
+                    color: 'grey',
+                  }}>
+                  Category*
+                </Text>
+              )}
+              <Text
+                style={{
+                  paddingBottom: moderateScale(windowWidth * 0.08),
+                  color: 'grey',
+                }}>
+                Amount
+              </Text>
+              <Text style={{color: 'grey'}}>Note</Text>
+            </View>
+            <View
+              style={{
+                width: windowWidth * 0.72,
+                marginTop: windowHeight * 0.043,
+                marginRight: windowWidth * 0.04,
+              }}>
+              <View
+                style={{
+                  ...styles.dateAndTime,
+                  marginBottom: moderateScale(windowWidth * 0.07),
+                }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    showDatePicker();
+                    hideCategoryodal();
+                    hidePaymentModal();
+                  }}>
+                  <Text style={{paddingRight: moderateScale(20)}}>
+                    {addDataState.inputs.Date.toDateString()}
+                  </Text>
+                </TouchableOpacity>
+                <DateTimePicker
+                  date={addDataState.inputs.Date}
+                  //  style={{width: 320, backgroundColor: "white"}}
+                  isVisible={isDatePickerVisible}
+                  mode="date"
+                  onConfirm={handleDateConfirm}
+                  onCancel={hideDatePicker}
+                  display="default"
+                  // onChange = {onChange}
+                />
+                <TouchableOpacity
+                  onPress={() => {
+                    showTimePicker();
+                    hideCategoryodal();
+                    hidePaymentModal();
+                  }}>
+                  <Text>
+                    {addDataState.inputs.Time.toLocaleTimeString().substring(
+                      0,
+                      5,
+                    )}
+                  </Text>
+                </TouchableOpacity>
+                <DateTimePicker
+                  date={addDataState.inputs.Time}
+                  isVisible={isTimePickerVisible}
+                  mode="time"
+                  is24Hour={true}
+                  display="default"
+                  onConfirm={handleTimeConfirm}
+                  onCancel={hideTimePicker}
+                />
+              </View>
+              <TouchableOpacity
+                onPress={() => {
+                  displayPaymentModal();
+                  hideCategoryodal();
+                }}
+                style={{
+                  borderBottomWidth: 1,
+                  marginBottom: moderateScale(windowWidth * 0.07),
+                  borderColor: isPaymentModalVisible ? '#DC143C' : 'lightgrey',
+                }}>
+                <Text style={{paddingBottom: moderateScale(5)}}>
+                  {addDataState.inputs.Payment}
+                </Text>
+              </TouchableOpacity>
+              {transfer ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    displayCategoryModal();
+                    hidePaymentModal();
+                  }}
+                  style={{
+                    borderBottomWidth: 1,
+                    marginBottom: moderateScale(windowWidth * 0.035),
+                    borderColor: isCategoryModalVisible
+                      ? '#DC143C'
+                      : 'lightgrey',
+                  }}>
+                  <Text style={{paddingBottom: moderateScale(5)}}>
+                    {addDataState.inputs.Category}
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => {
+                    displayCategoryModal();
+                    hidePaymentModal();
+                  }}
+                  style={{
+                    borderBottomWidth: 1,
+                    marginBottom: moderateScale(windowWidth * 0.035),
+                    borderColor: isCategoryModalVisible
+                      ? '#DC143C'
+                      : 'lightgrey',
+                  }}>
+                  <Text style={{paddingBottom: moderateScale(5)}}>
+                    {addDataState.inputs.Category}
+                  </Text>
+                </TouchableOpacity>
+              )}
+              <TextInput
+                {...props}
+                onFocus={() => {
+                  showFocusAmount();
+                  hideCategoryodal();
+                  hidePaymentModal();
+                }}
+                onBlur={hideFocusAmount}
+                placeholder="0.00"
+                keyboardType="decimal-pad"
+                //caretHidden={true}
+                style={{
+                  ...styles.textInput,
+                  borderBottomColor: onFocusAmount ? '#DC143C' : 'lightgrey',
+                  borderBottomWidth: 1,
+                  paddingBottom: moderateScale(0),
+                  marginBottom: moderateScale(windowWidth * 0.03),
+                }}
+                value={addDataState.inputs.Amount}
+                onChangeText={textChangeHandler.bind(this, 'Amount')}
+              />
+              <TouchableOpacity
+                style={{
+                  position: 'absolute',
+                  marginTop: moderateScale(windowHeight * 0.18),
+                  marginLeft: moderateScale(windowWidth * 0.59),
+                }}>
+                <Icon
+                  name="circle-with-cross"
+                  size={moderateScale(20)}
+                  color="black"
+                  onPress={textChangeHandler.bind(this, 'Amount', '')}
+                />
+              </TouchableOpacity>
+              <TextInput
+                {...props}
+                onFocus={() => {
+                  hideCategoryodal();
+                  hidePaymentModal();
+                  showFocusNote();
+                }}
+                onBlur={hideFocusNote}
+                //multiline={true}
+                style={{
+                  ...styles.textInput,
+                  borderBottomWidth: moderateScale(1),
+                  borderBottomColor: onFocusNote ? '#DC143C' : 'lightgrey',
+                  marginBottom: moderateScale(windowWidth * 0.005),
+                  paddingBottom: moderateScale(0),
+                }}
+                value={addDataState.inputs.Note}
+                onChangeText={textChangeHandler.bind(this, 'Note')}
+              />
+            </View>
+          </View>
+          <View
+            style={{
+              paddingTop: 25,
+              borderBottomColor: '#ECECEC',
+              borderBottomWidth: 10,
+            }}
+          />
+          <TextInput
+            {...props}
+            onFocus={() => {
+              hideCategoryodal();
+              hidePaymentModal();
+              showFocusDescription();
+            }}
+            onBlur={hideFocusDescription}
+            multiline={true}
+            placeholder="Description"
+            style={{
+              ...styles.textInput,
+              borderBottomColor: onFocusDescription ? '#DC143C' : 'lightgrey',
+              marginHorizontal: moderateScale(10),
+              marginTop: moderateScale(5),
+              paddingBottom: moderateScale(2),
+            }}
+            value={addDataState.inputs.Description}
+            onChangeText={textChangeHandler.bind(this, 'Description')}
+          />
+          <View style={{...styles.customButton, paddingTop: moderateScale(40)}}>
+            <CustomButton style={{backgroundColor: color}} onSave={saveHandler}>
+              Save
+            </CustomButton>
+          </View>
+          <View style={{...styles.customButton, paddingTop: moderateScale(10)}}>
+            <CustomButton
+              style={{backgroundColor: '#696969'}}
+              onSave={backHandler}>
+              Back
+            </CustomButton>
+          </View>
+          <View style={{height: 40}} />
+        </ScrollView>
+      )}
 
       {isPaymentModalVisible ? (
         <View style={styles.modalViewContainer}>
@@ -677,15 +824,10 @@ const styles = ScaledSheet.create({
     justifyContent: 'space-between',
   },
 
-  leftContainer: {
-    marginLeft: '15@ms',
-    marginTop: '35@ms',
-  },
-
-  rightContainer: {
-    marginTop: '35@ms',
-    marginRight: '15@ms',
-    width: '70%',
+  centerLoader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   textInput: {
@@ -696,19 +838,10 @@ const styles = ScaledSheet.create({
   customButton: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: '40@ms',
   },
 
   dateAndTime: {
     flexDirection: 'row',
-  },
-
-  loadingIndicatorStyle: {
-    borderRadius: '20@ms',
-    backgroundColor: '#DC143C',
-    marginTop: '40@ms',
-    margin: '110@ms',
-    padding: '13@ms',
   },
 
   modalViewContainer: {
@@ -718,6 +851,12 @@ const styles = ScaledSheet.create({
 
   modalText: {
     color: 'white',
+  },
+
+  noNetworkImage: {
+    height: '100%',
+    width: '100%',
+    marginBottom: '100@ms',
   },
 
   innerModalView: {

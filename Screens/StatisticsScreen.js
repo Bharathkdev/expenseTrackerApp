@@ -1,5 +1,11 @@
 import React, {useCallback, useRef, useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity, ImageBackground} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ImageBackground,
+  Button,
+} from 'react-native';
 import MonthYearPicker from '../Components/MonthYearPicker';
 import {ScaledSheet, moderateScale} from 'react-native-size-matters';
 import StatisticsIncomeScreen from '../Components/StatisticsTemplate';
@@ -56,13 +62,12 @@ const StatisticsScreen = (props) => {
     try {
       console.log('Month year filters in add ', monthYearFilterData);
       await dispatch(AddDataActions.fetchData());
-     
     } catch (error) {
       setError(error.message);
       console.log('Im daily screen error: ', error.message);
     }
-    if(mounted.current) {
-    setIsLoading(false);
+    if (mounted.current) {
+      setIsLoading(false);
     }
   }, [monthYearFilterData]);
 
@@ -76,11 +81,9 @@ const StatisticsScreen = (props) => {
   }, [monthYearFilterData]);
 
   useEffect(() => {
-    
-      if (props.isFocused) {
-        loadStatisticsData();
-      }
-    
+    if (props.isFocused) {
+      loadStatisticsData();
+    }
   }, [monthYearFilterData, dataFromRedux, props.isFocused]);
 
   useEffect(() => {
@@ -151,19 +154,38 @@ const StatisticsScreen = (props) => {
 
   if (error) {
     return (
-      <View style={styles.centerLoader}>
-        <Text style={{color: 'grey'}}>
-          {error === 'Network request failed' ? (
-            <Text>Check your Internet Connectivity</Text>
-          ) : (
-            <Text>An error occured!!</Text>
-          )}
-        </Text>
-        <Button
-          title="Try Again"
-          color={Colors.primaryColor}
-          onPress={loadDataForDaily}
-        />
+      <View style={{...styles.centerLoader, backgroundColor: 'white'}}>
+        {error === 'Network request failed' ? (
+          <ImageBackground
+            style={styles.noNetworkImage}
+            resizeMode="contain"
+            source={require('../assets/images/noInternet.jpg')}>
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                marginBottom: moderateScale(90),
+              }}>
+              <Button
+                title="Reload"
+                color={Colors.primaryColor}
+                onPress={loadDataForStatistics}
+              />
+            </View>
+          </ImageBackground>
+        ) : (
+          <>
+            <Text style={{marginBottom: moderateScale(10)}}>
+              Something went wrong!!
+            </Text>
+            <Button
+              title="Reload"
+              color={Colors.primaryColor}
+              onPress={loadDataForStatistics}
+            />
+          </>
+        )}
       </View>
     );
   }
@@ -255,6 +277,12 @@ const styles = ScaledSheet.create({
   textStyle: {
     fontFamily: 'OpenSans-Bold',
     padding: '10@ms',
+  },
+
+  noNetworkImage: {
+    height: '100%',
+    width: '100%',
+    marginBottom: '100@ms',
   },
 
   centerLoader: {

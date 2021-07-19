@@ -31,6 +31,7 @@ const DailyTemplate = (props) => {
         params: {
           dataID: null,
           date: props.date.toDateString(),
+          category: props.category,
         },
       });
     }

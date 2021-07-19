@@ -1,5 +1,5 @@
 import React, {useState, useRef, useCallback, useEffect} from 'react';
-import {View, Text, StyleSheet, FlatList, Dimensions} from 'react-native';
+import {View, Text, Button, ImageBackground} from 'react-native';
 
 import {useSelector, useDispatch} from 'react-redux';
 import Colors from '../Constants/Colors';
@@ -101,19 +101,38 @@ const AccountsScreen = (props) => {
 
   if (error) {
     return (
-      <View style={styles.centerLoader}>
-        <Text style={{color: 'grey'}}>
-          {error === 'Network request failed' ? (
-            <Text>Check your Internet Connectivity</Text>
-          ) : (
-            <Text>An error occured!!</Text>
-          )}
-        </Text>
-        <Button
-          title="Try Again"
-          color={Colors.primaryColor}
-          onPress={loadDataForDaily}
-        />
+      <View style={{...styles.centerLoader, backgroundColor: 'white'}}>
+        {error === 'Network request failed' ? (
+          <ImageBackground
+            style={styles.noNetworkImage}
+            resizeMode="contain"
+            source={require('../assets/images/noInternet.jpg')}>
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                marginBottom: moderateScale(90),
+              }}>
+              <Button
+                title="Reload"
+                color={Colors.primaryColor}
+                onPress={loadDataForAccounts}
+              />
+            </View>
+          </ImageBackground>
+        ) : (
+          <>
+            <Text style={{marginBottom: moderateScale(10)}}>
+              Something went wrong!!
+            </Text>
+            <Button
+              title="Reload"
+              color={Colors.primaryColor}
+              onPress={loadDataForAccounts}
+            />
+          </>
+        )}
       </View>
     );
   }
@@ -125,7 +144,7 @@ const AccountsScreen = (props) => {
       {isLoading ? (
         <BouncingLoader />
       ) : (
-        <View>
+        <View style={{flex: 1}}>
           <View style={styles.totalAmountStyle}>
             <Text style={{color: 'grey'}}>Total Balance</Text>
             {totalAmount < 0 ? (
@@ -183,9 +202,9 @@ const AccountsScreen = (props) => {
               borderColor: 'white',
             }}
           />
-          <View style={{backgroundColor: '#F5F5F5'}}>
+          <View style={{flex: 1, backgroundColor: '#F5F5F5'}}>
             <BarChart
-              marginTop={moderateScale(-20)}
+              marginTop={moderateScale(-5)}
               marginLeft={moderateScale(-5)}
               marginBottom={moderateScale(10)}
               totalIncome={totalIncome}
@@ -242,6 +261,12 @@ const styles = ScaledSheet.create({
   text: {
     fontSize: '12@ms',
     fontFamily: 'OpenSans-Regular',
+  },
+
+  noNetworkImage: {
+    height: '100%',
+    width: '100%',
+    marginBottom: '100@ms',
   },
 
   headerTextStyle: {

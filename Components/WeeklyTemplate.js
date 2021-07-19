@@ -21,13 +21,13 @@ const WeeklyTemplate = (props) => {
         <View
           style={{
             ...styles.monthBox,
-            borderColor: currentWeek ? '#DC143C' : 'grey',
+            borderColor: currentWeek ? 'tomato' : 'grey',
           }}>
           <View style={{flexDirection: 'row'}}>
             {props.dataDetails.startDate.getDate() < 10 ? (
               <Text
                 style={{
-                  color: currentWeek ? '#DC143C' : 'black',
+                  color: currentWeek ? 'tomato' : 'black',
                   fontFamily: 'OpenSans-Bold',
                 }}>
                 0
@@ -37,7 +37,7 @@ const WeeklyTemplate = (props) => {
             )}
             <Text
               style={{
-                color: currentWeek ? '#DC143C' : 'black',
+                color: currentWeek ? 'tomato' : 'black',
                 fontFamily: 'OpenSans-Bold',
               }}>
               {props.dataDetails.startDate.getDate()}.
@@ -45,7 +45,7 @@ const WeeklyTemplate = (props) => {
             {props.dataDetails.startDate.getMonth() + 1 < 10 ? (
               <Text
                 style={{
-                  color: currentWeek ? '#DC143C' : 'black',
+                  color: currentWeek ? 'tomato' : 'black',
                   fontFamily: 'OpenSans-Bold',
                 }}>
                 0
@@ -55,7 +55,7 @@ const WeeklyTemplate = (props) => {
             )}
             <Text
               style={{
-                color: currentWeek ? '#DC143C' : 'black',
+                color: currentWeek ? 'tomato' : 'black',
                 fontFamily: 'OpenSans-Bold',
               }}>
               {props.dataDetails.startDate.getMonth() + 1}
@@ -66,7 +66,7 @@ const WeeklyTemplate = (props) => {
             {props.dataDetails.endDate.getDate() < 10 ? (
               <Text
                 style={{
-                  color: currentWeek ? '#DC143C' : 'black',
+                  color: currentWeek ? 'tomato' : 'black',
                   fontFamily: 'OpenSans-Bold',
                 }}>
                 {' '}
@@ -75,7 +75,7 @@ const WeeklyTemplate = (props) => {
             ) : (
               <Text
                 style={{
-                  color: currentWeek ? '#DC143C' : 'black',
+                  color: currentWeek ? 'tomato' : 'black',
                   fontFamily: 'OpenSans-Bold',
                 }}>
                 {' '}
@@ -84,7 +84,7 @@ const WeeklyTemplate = (props) => {
             )}
             <Text
               style={{
-                color: currentWeek ? '#DC143C' : 'black',
+                color: currentWeek ? 'tomato' : 'black',
                 fontFamily: 'OpenSans-Bold',
               }}>
               {props.dataDetails.endDate.getDate()}.
@@ -92,7 +92,7 @@ const WeeklyTemplate = (props) => {
             {props.dataDetails.endDate.getMonth() + 1 < 10 ? (
               <Text
                 style={{
-                  color: currentWeek ? '#DC143C' : 'black',
+                  color: currentWeek ? 'tomato' : 'black',
                   fontFamily: 'OpenSans-Bold',
                 }}>
                 0
@@ -102,7 +102,7 @@ const WeeklyTemplate = (props) => {
             )}
             <Text
               style={{
-                color: currentWeek ? '#DC143C' : 'black',
+                color: currentWeek ? 'tomato' : 'black',
                 fontFamily: 'OpenSans-Bold',
               }}>
               {props.dataDetails.endDate.getMonth() + 1}
@@ -163,10 +163,6 @@ const styles = ScaledSheet.create({
     marginVertical: '10@ms',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-
-  monthText: {
-    textAlign: 'center',
   },
 
   monthBox: {

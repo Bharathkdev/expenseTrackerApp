@@ -169,9 +169,9 @@ const StatisticsTemplate = (props) => {
                     }}
                     style={{
                       fill: 'black',
-                      fontSize: ({datum}) =>
-                        datum.category.length > 10 ? 8 : 10,
-                      //fontSize: 12,
+                      // fontSize: ({datum}) =>
+                      //   datum.category.length > 10 ? 8 : 10,
+                      fontSize: 10,
                       fontFamily: 'OpenSans-Bold',
                     }}
                     constrainToVisibleArea
@@ -189,7 +189,7 @@ const StatisticsTemplate = (props) => {
                 // endAngle={600}
                 // padAngle={0}
                 //
-                labelRadius={graphicData.length > 4 ? 85 : 110}
+                //labelRadius={graphicData.length > 4 ? 85 : 110}
                 events={[
                   {
                     target: 'data',
@@ -274,6 +274,7 @@ const StatisticsTemplate = (props) => {
                     total={props.total}
                     color={graphicColor}
                     index={index}
+                    type={props.type}
                     navigation={props.navigation}
                   />
                 );

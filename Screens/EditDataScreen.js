@@ -1,12 +1,20 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {View, StyleSheet, Text, Button, Alert, BackHandler} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Text,
+  Button,
+  Alert,
+  BackHandler,
+  ImageBackground,
+} from 'react-native';
 import DailyScreen from './DailyScreen';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useSelector, useDispatch} from 'react-redux';
 import * as AddDataActions from '../Store/Actions/AddDataAction';
 import Colors from '../Constants/Colors';
 import BouncingLoader from '../Components/BouncingLoader';
-import {moderateScale} from 'react-native-size-matters';
+import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 import DailyTemplate from '../Components/DailyTemplate';
 
 const EditDataScreen = (props) => {
@@ -94,19 +102,25 @@ const EditDataScreen = (props) => {
 
   if (error) {
     return (
-      <View style={styles.centerLoader}>
-        <Text style={{color: 'grey'}}>
-          {error === 'Network request failed' ? (
-            <Text>Check your Internet Connectivity</Text>
-          ) : (
-            <Text>An error occured!!</Text>
-          )}
-        </Text>
-        <Button
-          title="Try Again"
-          color={Colors.primaryColor}
-          onPress={deleteMutipleData}
-        />
+      <View style={{...styles.centerLoader, backgroundColor: 'white'}}>
+        {error === 'Network request failed' ? (
+          <ImageBackground
+            style={styles.noNetworkImage}
+            resizeMode="contain"
+            source={require('../assets/images/noInternet.jpg')}>
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                marginBottom: moderateScale(70),
+              }}></View>
+          </ImageBackground>
+        ) : (
+          <Text style={{marginBottom: moderateScale(10)}}>
+            Something went wrong!!
+          </Text>
+        )}
       </View>
     );
   }
@@ -190,7 +204,7 @@ EditDataScreen.navigationOptions = (navData) => {
   };
 };
 
-const styles = StyleSheet.create({
+const styles = ScaledSheet.create({
   leftIcon: {
     marginLeft: 20,
   },
@@ -204,6 +218,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 17,
     backgroundColor: '#040720',
+  },
+
+  noNetworkImage: {
+    height: '100%',
+    width: '100%',
+    marginBottom: '100@ms',
   },
 
   centerLoader: {

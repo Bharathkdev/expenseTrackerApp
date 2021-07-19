@@ -8,50 +8,7 @@ import AddDataScreen from '../Screens/AddDataScreen';
 import EditDataScreen from '../Screens/EditDataScreen';
 import MonthlyScreen from '../Screens/MonthlyScreen';
 import CalendarScreen from '../Screens/CalendarScreen';
-import {ScaledSheet, moderateScale} from 'react-native-size-matters';
-
-const DailyNavigator = createStackNavigator({
-  Daily: {
-    screen: DailyScreen,
-    navigationOptions: {
-      headerShown: false,
-    },
-  },
-  // AddData: AddDataScreen,
-  // EditData: {
-  //     screen: EditDataScreen,
-  //     navigationOptions: {
-  //         headerShown: true
-  //     }
-  // },
-});
-
-const WeeklyNavigator = createStackNavigator({
-  Weekly: {
-    screen: WeeklyScreen,
-    navigationOptions: {
-      headerShown: false,
-    },
-  },
-});
-
-const MonthlyNavigator = createStackNavigator({
-  Monthly: {
-    screen: MonthlyScreen,
-    navigationOptions: {
-      headerShown: false,
-    },
-  },
-});
-
-const CalendarNavigator = createStackNavigator({
-  Calendar: {
-    screen: CalendarScreen,
-    navigationOptions: {
-      headerShown: false,
-    },
-  },
-});
+import {moderateScale} from 'react-native-size-matters';
 
 const TransactionsTopBar = createMaterialTopTabNavigator(
   {
