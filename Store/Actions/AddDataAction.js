@@ -358,9 +358,9 @@ export const updateData = (
     );
 
     if (
-      !(yearToUpdate in getState().data.dataItems) ||
-      !(monthToUpdate in getState().data.dataItems[yearToUpdate]) ||
-      !(dateToUpdate in getState().data.dataItems[yearToUpdate][monthToUpdate])
+      !getState().data.dataItems[yearToUpdate] ||
+      !getState().data.dataItems[yearToUpdate][monthToUpdate] ||
+      !getState().data.dataItems[yearToUpdate][monthToUpdate][dateToUpdate]
     ) {
       console.log('Im income update 1');
 
@@ -809,7 +809,6 @@ export const updateData = (
       );
     }
   };
-  // return { type: UPDATE_DATA, data: { id: id, type: type, fromDate: fromDate, toDate: toDate, time: time, payment: payment, category: category, amount: amount, note: note, description: description } };
 };
 
 const deleteDate = async (year, month, date) => {
@@ -831,11 +830,6 @@ export const deleteMultipleData = (deleteItems, year, month) => {
     let deleteTotalIncomeAllDateUpdate = getState().data.totalIncome,
       deleteTotalExpenseAllDateUpdate = getState().data.totalExpense;
 
-    console.log(
-      'Update delete data selected items: ',
-      getState().data.selectedDataItems,
-      deleteItems,
-    );
     for await (const arr of deleteItems) {
       const index = arr.index;
       const date = arr.date;
@@ -891,13 +885,6 @@ export const deleteMultipleData = (deleteItems, year, month) => {
           deleteTotalExpenseUpdate -= arr.amount;
           deleteTotalExpenseAllDateUpdate -= arr.amount;
         }
-
-        console.log(
-          'Delete multiple data seconds: ',
-          arr,
-          deleteTotalIncomeUpdate,
-          deleteTotalExpenseUpdate,
-        );
 
         const updateDeleteData = await fetch(
           `https://money-manager-252627-default-rtdb.firebaseio.com/dataItems/${year}/${month}/${date}/${index}.json`,

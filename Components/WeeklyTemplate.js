@@ -25,7 +25,11 @@ const WeeklyTemplate = (props) => {
           }}>
           <View style={{flexDirection: 'row'}}>
             {props.dataDetails.startDate.getDate() < 10 ? (
-              <Text style={{color: 'black', fontFamily: 'OpenSans-Bold'}}>
+              <Text
+                style={{
+                  color: currentWeek ? '#DC143C' : 'black',
+                  fontFamily: 'OpenSans-Bold',
+                }}>
                 0
               </Text>
             ) : (
@@ -117,7 +121,10 @@ const WeeklyTemplate = (props) => {
             style={{
               color: 'green',
             }}>
-            {'\u20A8'} {props.dataDetails.income.toFixed(2)}
+            {'\u20A8'}{' '}
+            {props.dataDetails.income
+              .toFixed(2)
+              .replace(/\B(?=(?:(\d\d)+(\d)(?!\d))+(?!\d))/g, ',')}
           </Text>
         </View>
         <View
@@ -133,7 +140,10 @@ const WeeklyTemplate = (props) => {
             style={{
               color: 'red',
             }}>
-            {'\u20A8'} {props.dataDetails.expense.toFixed(2)}
+            {'\u20A8'}{' '}
+            {props.dataDetails.expense
+              .toFixed(2)
+              .replace(/\B(?=(?:(\d\d)+(\d)(?!\d))+(?!\d))/g, ',')}
           </Text>
         </View>
       </View>

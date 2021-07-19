@@ -6,14 +6,23 @@ const StatisticsList = (props) => {
   console.log('Total in statistics: ', props.color, props.index);
   return (
     <View>
-      <View style={styles.listContainer}>
+      <TouchableOpacity
+        style={styles.listContainer}
+        onPress={() => {
+          props.navigation.navigate('Category', {
+            category: props.dataDetails.category,
+          });
+        }}>
         <View
           style={{
             ...styles.percentageView,
             backgroundColor: props.color[props.index],
           }}>
           <Text style={{textAlign: 'center', color: 'white'}}>
-            {Math.round((props.dataDetails.amount / props.total) * 100)} %
+            {props.dataDetails.amount === 0
+              ? '0'
+              : Math.round((props.dataDetails.amount / props.total) * 100)}{' '}
+            %
           </Text>
         </View>
         <View style={styles.categoryView}>
@@ -22,7 +31,7 @@ const StatisticsList = (props) => {
         <View style={styles.amountView}>
           <Text>Rs. {props.dataDetails.amount.toFixed(2)}</Text>
         </View>
-      </View>
+      </TouchableOpacity>
       <View
         style={{
           borderBottomColor: '#F5F5F5',

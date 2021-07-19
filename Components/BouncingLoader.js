@@ -9,8 +9,8 @@ const BouncingLoader = (props) => {
         icons={[
           'https://image.flaticon.com/icons/png/128/73/73238.png',
           'https://image.flaticon.com/icons/png/512/153/153604.png',
-          'https://image.flaticon.com/icons/png/512/17/17132.png',
-          'https://img-premium.flaticon.com/png/512/442/premium/442615.png?token=exp=1624903043~hmac=38ac679885409b6756f348060701c68f',
+          // 'https://image.flaticon.com/icons/png/512/17/17132.png',
+          // 'https://img-premium.flaticon.com/png/512/442/premium/442615.png?token=exp=1624903043~hmac=38ac679885409b6756f348060701c68f',
         ]}
         // leftRotation="-680deg"
         // rightRotation="360deg"

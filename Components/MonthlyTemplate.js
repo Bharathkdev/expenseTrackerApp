@@ -66,7 +66,10 @@ const MonthlyTemplate = (props) => {
         </View>
         <View style={{flex: 1, alignItems: 'flex-end', paddingLeft: 10}}>
           <Text adjustsFontSizeToFit numberOfLines={1} style={{color: 'green'}}>
-            {'\u20A8'} {props.dataDetails.income.toFixed(2)}
+            {'\u20A8'}{' '}
+            {props.dataDetails.income
+              .toFixed(2)
+              .replace(/\B(?=(?:(\d\d)+(\d)(?!\d))+(?!\d))/g, ',')}
           </Text>
         </View>
         <View
@@ -77,7 +80,10 @@ const MonthlyTemplate = (props) => {
             paddingRight: 20,
           }}>
           <Text adjustsFontSizeToFit numberOfLines={1} style={{color: 'red'}}>
-            {'\u20A8'} {props.dataDetails.expense.toFixed(2)}
+            {'\u20A8'}{' '}
+            {props.dataDetails.expense
+              .toFixed(2)
+              .replace(/\B(?=(?:(\d\d)+(\d)(?!\d))+(?!\d))/g, ',')}
           </Text>
         </View>
       </View>

@@ -16,6 +16,7 @@ import customHeaderButton from '../Components/HeaderButton';
 import Colors from '../Constants/Colors';
 import Icon from 'react-native-vector-icons/Ionicons';
 import TransactionsTopNavigator from '../Navigator/TransactionsTopNavigator';
+import {withNavigationFocus} from 'react-navigation';
 import * as AddDataActions from '../Store/Actions/AddDataAction';
 import {ScaledSheet, moderateScale} from 'react-native-size-matters';
 
@@ -59,18 +60,36 @@ const TransactionsScreen = (props) => {
 
   useEffect(() => {
     console.log('Edit screen: ', visibilityData);
-    props.navigation.setParams({
-      visible: visibilityData.addDataVisible,
-      monthEnable: monthEnable.screen,
-    });
-  }, [visibilityData, monthEnable]);
+    if (props.isFocused) {
+      props.navigation.setParams({
+        visible: visibilityData.addDataVisible,
+        monthEnable: monthEnable.screen,
+      });
+    }
+  }, [visibilityData, monthEnable, props.isFocused]);
 
   useEffect(() => {
-    props.navigation.setParams({month: months[month], year: year});
-    dispatch(
-      AddDataActions.updateVisibility(true, visibilityData.editDataVisible),
-    );
-  }, [monthYearFilterData, dispatch]);
+    if (props.isFocused) {
+      props.navigation.setParams({month: months[month], year: year});
+      dispatch(
+        AddDataActions.updateVisibility(true, visibilityData.editDataVisible),
+      );
+    }
+  }, [monthYearFilterData, props.isFocused]);
+
+  // useEffect(() => {
+  //   dispatch(
+  //     AddDataActions.updateVisibility(true, visibilityData.editDataVisible),
+  //   );
+  // }, []);
+
+  // useEffect(() => {
+  //   if (props.isFocused) {
+  //     dispatch(
+  //       AddDataActions.updateVisibility(true, visibilityData.editDataVisible),
+  //     );
+  //   }
+  // }, [props.isFocused]);
 
   return (
     <>
@@ -144,4 +163,4 @@ const styles = ScaledSheet.create({
   },
 });
 
-export default TransactionsScreen;
+export default withNavigationFocus(TransactionsScreen);

@@ -7,6 +7,7 @@ import * as AddDataActions from '../Store/Actions/AddDataAction';
 import Colors from '../Constants/Colors';
 import BouncingLoader from '../Components/BouncingLoader';
 import {moderateScale} from 'react-native-size-matters';
+import DailyTemplate from '../Components/DailyTemplate';
 
 const EditDataScreen = (props) => {
   console.log('Im the edit data screen');
@@ -67,9 +68,7 @@ const EditDataScreen = (props) => {
 
   useEffect(() => {
     if (selectedDataItems.length == 0) {
-      props.navigation.navigate({
-        routeName: 'Daily',
-      });
+      props.navigation.goBack();
       dispatch(AddDataActions.updateVisibility(true, false));
     }
   }, [selectedDataItems.length]);
@@ -123,7 +122,10 @@ const EditDataScreen = (props) => {
           adjustsFontSizeToFit
           numberOfLines={1}
           style={styles.textStyle}>
-          Rs. {totalAmount.toFixed(2)}
+          Rs.{' '}
+          {totalAmount
+            .toFixed(2)
+            .replace(/\B(?=(?:(\d\d)+(\d)(?!\d))+(?!\d))/g, ',')}
         </Text>
       </View>
       {isLoading ? <BouncingLoader /> : <DailyScreen />}
@@ -154,7 +156,7 @@ EditDataScreen.navigationOptions = (navData) => {
           size={35}
           color="grey"
           onPress={() => {
-            navData.navigation.navigate('Daily');
+            navData.navigation.goBack();
             dispatch(AddDataActions.updateVisibility(true, false));
             dispatch(AddDataActions.clearDataSelection());
           }}
