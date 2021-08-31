@@ -1,6 +1,5 @@
 import React from 'react';
 import {View, Text, Dimensions} from 'react-native';
-import {baseProps} from 'react-native-gesture-handler/dist/src/handlers/gestureHandlers';
 
 import {ScaledSheet, moderateScale} from 'react-native-size-matters';
 import {

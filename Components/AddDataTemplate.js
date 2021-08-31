@@ -272,10 +272,10 @@ const AddDataTemplate = (props) => {
   );
 
   const backHandler = () => {
-    props.navigation.goBack();
     dispatch(
       AddDataActions.updateVisibility(true, visibilityData.editDataVisible),
     );
+    props.navigation.goBack();
   };
 
   const saveHandler = async () => {

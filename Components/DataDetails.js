@@ -280,7 +280,7 @@ const styles = ScaledSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: '10@ms',
+    paddingVertical: '12@ms',
     paddingHorizontal: '20@ms',
   },
 });

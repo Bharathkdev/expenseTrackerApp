@@ -9,10 +9,7 @@ import {
 } from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 
-import {HeaderButtons, Item} from 'react-navigation-header-buttons';
 import MonthYearPicker from '../Components/MonthYearPicker';
-import DeleteItemsComponent from '../Components/DeleteItemsComponent';
-import customHeaderButton from '../Components/HeaderButton';
 import Colors from '../Constants/Colors';
 import Icon from 'react-native-vector-icons/Ionicons';
 import TransactionsTopNavigator from '../Navigator/TransactionsTopNavigator';
@@ -56,7 +53,7 @@ const TransactionsScreen = (props) => {
 
   console.log('Month year filter: ', monthYearFilterData);
 
-  console.log('Month enabled: ', monthEnable);
+  console.log('Month enabled: ', monthEnable, visibilityData);
 
   useEffect(() => {
     console.log('Edit screen: ', visibilityData);
@@ -83,7 +80,7 @@ const TransactionsScreen = (props) => {
   return (
     <>
       <TransactionsTopNavigator />
-      {visibilityData.addDataVisible && monthEnable.screen != 'Category' ? (
+      {visibilityData.addDataVisible ? (
         <View style={styles.addIcon}>
           <Icon
             name="md-add-circle-sharp"
@@ -117,7 +114,7 @@ TransactionsScreen.navigationOptions = (navData) => {
   console.log('Visibility: ', visibility, enableMonth);
 
   return {
-    headerShown: visibility && enableMonth != 'Category' ? true : false,
+    headerShown: visibility ? true : false,
     headerTitleContainerStyle: {
       left: enableMonth === 'Monthly' ? moderateScale(50) : moderateScale(55),
     },
@@ -127,9 +124,6 @@ TransactionsScreen.navigationOptions = (navData) => {
       </Text>
     ),
     headerLeft: () => <MonthYearPicker />,
-    // headerRight: () => (
-    //     <DeleteItemsComponent />
-    // )
   };
 };
 

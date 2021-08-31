@@ -17,7 +17,7 @@ const CustomButton = (props) => {
 
 const styles = ScaledSheet.create({
   buttonView: {
-    borderRadius: '10@ms',
+    borderRadius: '7@ms',
     padding: '10@ms',
   },
 

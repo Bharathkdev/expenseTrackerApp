@@ -6,6 +6,7 @@ import {
   Button,
   ImageBackground,
   TouchableOpacity,
+  RefreshControl,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import Colors from '../Constants/Colors';
@@ -60,7 +61,7 @@ const DailyScreen = (props) => {
     if (mounted.current) {
       setIsLoading(false);
     }
-  }, [monthYearFilterData, props.isFocused]);
+  }, [monthYearFilterData, props.isFocused, isLoading, error]);
 
   const loadDailyData = useCallback(() => {
     dispatch(
@@ -182,6 +183,12 @@ const DailyScreen = (props) => {
         <FlatList
           keyExtractor={(item) => item.date.toDateString()}
           data={dataItems}
+          refreshControl={
+            <RefreshControl
+              refreshing={isLoading}
+              onRefresh={loadDataForDaily}
+            />
+          }
           renderItem={(itemData) => {
             console.log(
               'Item data in daily screen:',
