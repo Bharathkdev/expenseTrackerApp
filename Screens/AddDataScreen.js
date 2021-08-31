@@ -32,6 +32,7 @@ const AddDataScreen = (props) => {
   const dataItemsFromRedux = useSelector((state) => state.data.dataItems);
 
   if (
+    dataItemsFromRedux &&
     Object.keys(dataItemsFromRedux).length != 0 &&
     dataID != null &&
     date != null &&
@@ -187,7 +188,9 @@ const AddDataScreen = (props) => {
         date={date}
         category={category}
         details={details}
-        dataID={Object.keys(details).length != 0 ? dataID : null}
+        dataID={
+          Object.keys(dataFromRedux).length != 0 && details ? dataID : null
+        }
         paymentItems={paymentItems}
         categoryItemsIncome={categoryItemsIncome}
         categoryItemsExpense={categoryItemsExpense}

@@ -48,16 +48,6 @@ export const fetchData = () => {
     const totalExpenseResponseData = await totalExpenseResponse.json();
     const totalIncomeResponseData = await totalIncomeResponse.json();
 
-    //    const dataGet = Object.keys(responseData["2021"]["5"]["Fri Jun 04 2021"]);
-
-    console.log(
-      'responseData for fetch data: ',
-      dataItemsResponseData,
-      totalExpenseResponseData,
-      totalBalanceResponseData,
-      totalIncomeResponseData,
-    );
-
     dispatch({
       type: SET_DATA,
       dataItems: dataItemsResponseData,
