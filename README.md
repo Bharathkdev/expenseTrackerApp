@@ -2,7 +2,9 @@
 
 📱 I've built a React Native app with an intuitive UI to simplify financial management! 💸✨
 
-<img width="325" alt="moneymanager" src="https://github.com/Bharathkdev/expenseTrackerApp/assets/46343966/95a14f4f-e25b-44e9-a69e-ee3b3e4fbf47">
+
+https://github.com/Bharathkdev/expenseTrackerApp/assets/46343966/7fc7a6e7-825b-4d54-9f0a-04473d57ce0a
+
 
 Witness how seamlessly you can handle income, transfers and expenses with sleek Victory Native charts and a robust Firebase realtime database, ensuring simplicity and efficiency. 📊🗄️
 
